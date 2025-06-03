@@ -1,5 +1,0 @@
-blank_issues_enabled: false
-issue_templates:
-  - name: 기본 TODO
-    description: 시작/종료 날짜가 포함된 TODO 를 등록합니다.
-    file: issue.yml
