@@ -1,0 +1,38 @@
+{
+  "name": "nb02-how-do-i-look-team1",
+  "version": "1.0.0",
+  "description": "## Entity Relationship Diagram ![erd](/resource/erd.png)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gyunam-bark/nb02-how-do-i-look-team1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gyunam-bark/nb02-how-do-i-look-team1/issues"
+  },
+  "homepage": "https://github.com/gyunam-bark/nb02-how-do-i-look-team1#readme",
+  "dependencies": {
+    "@prisma/client": "^6.8.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "morgan": "^1.10.0",
+    "multer": "^2.0.0",
+    "prisma": "^6.8.2"
+  },
+  "type": "module",
+  "devDependencies": {
+    "eslint": "^9.28.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.1",
+    "prettier": "^3.5.3"
+  }
+}
