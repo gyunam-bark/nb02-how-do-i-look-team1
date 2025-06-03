@@ -1,0 +1,26 @@
+name: 기본 TODO
+description: 시작/종료 날짜가 포함된 TODO를 등록합니다.
+body:
+  - type: input
+    id: start-date
+    attributes:
+      label: 시작날짜
+      description: 시작 날짜를 YYYY-MM-DD 형식으로 입력하세요.
+      placeholder: 2025-06-02
+    validations:
+      required: true
+
+  - type: input
+    id: end-date
+    attributes:
+      label: 종료날짜
+      description: 종료 날짜를 YYYY-MM-DD 형식으로 입력하세요.
+      placeholder: 2025-06-20
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: TODO 설명
+      description: TODO 상세 내용을 작성하세요.
