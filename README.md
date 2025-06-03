@@ -1,1 +1,4 @@
-# nb02-how-do-i-look-team1
+# TEAM 1
+
+## Entity Relationship Diagram
+![erd](/resource/erd.png)
