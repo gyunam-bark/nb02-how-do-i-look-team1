@@ -38,6 +38,6 @@
     "eslint-plugin-prettier": "^5.4.1",
     "nodemon": "^3.1.10",
     "prettier": "^3.5.3",
-    "prisma": "^6.8.2"
+    "prisma": "^6.9.0"
   }
 }
