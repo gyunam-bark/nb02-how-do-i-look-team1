@@ -25,7 +25,7 @@ model Style {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  curation   Curation[]
+  curations  Curation[]
   categories Category[]
   comments   Comment[]
   images     Image[]
@@ -63,14 +63,24 @@ model Comment {
 }
 
 model Category {
-  categoryId Int    @id @default(autoincrement())
+  categoryId Int          @id @default(autoincrement())
   styleId    Int
-  type       String
-  name       String @unique
+  type       CategoryType
+  name       String
   brand      String
   price      BigInt
 
   style Style @relation(fields: [styleId], references: [styleId])
+}
+
+enum CategoryType {
+  TOP
+  BOTTOM
+  OUTER
+  DRESS
+  BAG
+  SHOES
+  ACCESSORY
 }
 
 model Image {
@@ -83,7 +93,7 @@ model Image {
 
 model Tag {
   tagId Int    @id @default(autoincrement())
-  name  String
+  name  String @unique
 
   styleTags StyleTag[] // 연결고리
 }
