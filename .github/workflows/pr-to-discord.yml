@@ -1,0 +1,51 @@
+name: Notify Reviewers on PR
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get PR reviewers
+        id: reviewers
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          REPO="${{ github.repository }}"
+
+          REVIEWERS=$(gh api repos/$REPO/pulls/$PR_NUMBER \
+            --jq '[.requested_reviewers[].login]' | jq -c)
+
+          echo "reviewers=$REVIEWERS" >> $GITHUB_OUTPUT
+
+      - name: Notify Discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          USER_MAP: ${{ secrets.USER_MAP }}
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          REVIEWERS=${{ steps.reviewers.outputs.reviewers }}
+
+          MENTION_LIST=""
+
+          for user in $(echo "$REVIEWERS" | jq -r '.[]'); do
+            DISCORD_ID=$(echo "$USER_MAP" | jq -r --arg u "$user" '.[$u] // empty')
+            if [ -n "$DISCORD_ID" ]; then
+              MENTION_LIST="$MENTION_LIST <@$DISCORD_ID>"
+            else
+              MENTION_LIST="$MENTION_LIST @$user"
+            fi
+          done
+
+          curl -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d @- <<EOF
+          {
+            "content": "${MENTION_LIST}\n새로운 Pull Request: **${PR_TITLE}**\n${PR_URL}"
+          }
+          EOF
