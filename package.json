@@ -2,6 +2,9 @@
   "name": "nb02-how-do-i-look-team1",
   "version": "1.0.0",
   "description": "## Entity Relationship Diagram ![erd](/resource/erd.png)",
+  "engines": {
+    "node": ">=22.15.0"
+  },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -25,14 +28,14 @@
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "morgan": "^1.10.0",
-    "multer": "^2.0.0",
-    "prisma": "^6.8.2"
+    "multer": "^2.0.0"
   },
   "type": "module",
   "devDependencies": {
     "eslint": "^9.28.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.4.1",
-    "prettier": "^3.5.3"
+    "prettier": "^3.5.3",
+    "prisma": "^6.9.0"
   }
 }

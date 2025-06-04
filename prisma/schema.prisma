@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Style {
+  styleId       Int      @id @default(autoincrement())
+  nickname      String   @unique
+  title         String
+  content       String
+  password      String
+  curationCount Int      @default(0)
+  viewCount     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  curations  Curation[]
+  categories Category[]
+  comments   Comment[]
+  images     Image[]
+  styleTags  StyleTag[] // 연결고리
+}
+
+model Curation {
+  curationId        Int      @id @default(autoincrement())
+  styleId           Int
+  nickname          String
+  content           String
+  password          String
+  trendy            Int
+  personality       Int
+  practicality      Int
+  costEffectiveness Int
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  style    Style     @relation(fields: [styleId], references: [styleId])
+  comments Comment[]
+}
+
+model Comment {
+  commentId  Int      @id @default(autoincrement())
+  curationId Int
+  styleId    Int
+  content    String
+  password   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  curation Curation @relation(fields: [curationId], references: [curationId])
+  style    Style    @relation(fields: [styleId], references: [styleId])
+}
+
+model Category {
+  categoryId Int          @id @default(autoincrement())
+  styleId    Int
+  type       CategoryType
+  name       String
+  brand      String
+  price      BigInt
+
+  style Style @relation(fields: [styleId], references: [styleId])
+}
+
+enum CategoryType {
+  TOP
+  BOTTOM
+  OUTER
+  DRESS
+  BAG
+  SHOES
+  ACCESSORY
+}
+
+model Image {
+  imageId  Int    @id @default(autoincrement())
+  styleId  Int
+  imageUrl String
+
+  style Style @relation(fields: [styleId], references: [styleId])
+}
+
+model Tag {
+  tagId Int    @id @default(autoincrement())
+  name  String @unique
+
+  styleTags StyleTag[] // 연결고리
+}
+
+model StyleTag {
+  styleId Int
+  tagId   Int
+
+  tag   Tag   @relation(fields: [tagId], references: [tagId])
+  style Style @relation(fields: [styleId], references: [styleId])
+
+  @@id([styleId, tagId]) // 복합 PK
+}
