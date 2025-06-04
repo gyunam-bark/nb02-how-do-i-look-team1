@@ -1,3 +1,5 @@
+// 서버 실행
+
 import dotenv from 'dotenv';
 import Server from './src/server.js';
 
