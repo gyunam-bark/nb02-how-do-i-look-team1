@@ -1,7 +1,6 @@
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
-import errorHandler from './middlewares/error-middleware.js';
 
 export default class Server {
   #app;
@@ -28,9 +27,7 @@ export default class Server {
 
   // 에러 핸들러 등록
   // this.#app.use(errorHandler);
-  #initializePostMiddlewares() {
-    this.#app.use(errorHandler);
-  }
+  #initializePostMiddlewares() {}
 
   run() {
     this.#app.listen(this.#port, () => {
