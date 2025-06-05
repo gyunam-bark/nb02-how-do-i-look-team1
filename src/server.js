@@ -3,6 +3,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import errorHandler from './middlewares/error-middleware.js';
 import tagRouter from './routes/tag-routers.js';
+import styleRouter from './routes/style-routes.js';
 
 export default class Server {
   #app;
@@ -27,6 +28,7 @@ export default class Server {
   // this.#app.use('/api/users', userRouter);
   #initializeRouters() {
     this.#app.use('/tags', tagRouter);
+    this.#app.use('/styles', styleRouter);
   }
 
   // 에러 핸들러 등록
