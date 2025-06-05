@@ -2,6 +2,7 @@ import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import errorHandler from './middlewares/error-middleware.js';
+import tagRouter from './routes/tag-routers.js';
 
 export default class Server {
   #app;
@@ -24,7 +25,9 @@ export default class Server {
 
   // 라우터 등록
   // this.#app.use('/api/users', userRouter);
-  #initializeRouters() {}
+  #initializeRouters() {
+    this.#app.use('/tags', tagRouter);
+  }
 
   // 에러 핸들러 등록
   // this.#app.use(errorHandler);
