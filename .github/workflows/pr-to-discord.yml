@@ -1,7 +1,7 @@
 name: Notify Reviewers on PR
 
 on:
-  workflow_dispatch: # 수동 실행 허용 (테스트용)
+  workflow_dispatch:
   pull_request:
     types: [opened, reopened, ready_for_review]
 
@@ -20,7 +20,6 @@ jobs:
 
           echo "Fetching reviewers for PR #$PR_NUMBER from $REPO"
 
-          # GitHub API 호출 및 예외 처리
           API_RESPONSE=$(gh api repos/$REPO/pulls/$PR_NUMBER 2>/dev/null || echo "")
 
           if [ -z "$API_RESPONSE" ]; then
@@ -31,7 +30,8 @@ jobs:
           fi
 
           echo "Reviewers JSON: $REVIEWERS"
-          echo "reviewers=$REVIEWERS" >> $GITHUB_OUTPUT
+          # JSON 문자열을 이중 인용부호 포함하여 출력값에 안전하게 저장
+          echo "reviewers=$(printf '%q' "$REVIEWERS")" >> "$GITHUB_OUTPUT"
 
       - name: Notify Discord
         env:
@@ -40,7 +40,10 @@ jobs:
         run: |
           PR_TITLE="${{ github.event.pull_request.title }}"
           PR_URL="${{ github.event.pull_request.html_url }}"
-          REVIEWERS=${{ steps.reviewers.outputs.reviewers }}
+
+          # REVIEWERS는 JSON 문자열임
+          REVIEWERS_JSON="${{ steps.reviewers.outputs.reviewers }}"
+          REVIEWERS=$(echo "$REVIEWERS_JSON" | jq -c '.')  # validate/normalize
 
           echo "Notifying Discord about PR: $PR_TITLE"
           echo "Reviewers to mention: $REVIEWERS"
