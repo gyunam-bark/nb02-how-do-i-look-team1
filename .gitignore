@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 node_modules/
 /generated/prisma
 .env
 prisma/migrations/*
+=======
+node_modules/.env
+>>>>>>> 85e1176 (feat: Add .env to .gitignore)
