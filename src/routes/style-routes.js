@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { StyleController } from '../controllers/style-controller.js';
+import { StyleController } from '../controllers/style-controllers.js';
 
 const router = Router();
 
