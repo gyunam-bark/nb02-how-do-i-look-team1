@@ -5,7 +5,6 @@ export const createComment = async (req, res, next) => {
     const comment = await createCommentService(req);
 
     return res.status(200).json({
-      message: '댓글이 등록 되었습니다.',
       comment: {
         commentId: comment.commentId,
         nickname: comment.nickname,
