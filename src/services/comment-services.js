@@ -42,5 +42,8 @@ export const createCommentService = async (req, _res, _next) => {
     },
   });
 
-  return comment;
+  return {
+    ...comment,
+    nickname: curation.style.nickname,
+  };
 };

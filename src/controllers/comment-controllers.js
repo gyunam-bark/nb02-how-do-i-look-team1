@@ -6,7 +6,12 @@ export const createComment = async (req, res, next) => {
 
     return res.status(200).json({
       message: '댓글이 등록 되었습니다.',
-      comment,
+      comment: {
+        commentId: comment.commentId,
+        nickname: comment.nickname,
+        content: comment.content,
+        createdAt: comment.createdAt,
+      },
     });
   } catch (err) {
     next(err);
