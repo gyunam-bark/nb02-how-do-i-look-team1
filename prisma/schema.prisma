@@ -25,11 +25,11 @@ model Style {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  curations  Curation[]
-  categories Category[]
-  comments   Comment[]
-  images     Image[]
-  styleTags  StyleTag[] // 연결고리
+  curations   Curation[]
+  categories  Category[]
+  comments    Comment[]
+  styleImages StyleImage[]
+  styleTags   StyleTag[] // 연결고리
 }
 
 model Curation {
@@ -84,11 +84,21 @@ enum CategoryType {
 }
 
 model Image {
-  imageId  Int    @id @default(autoincrement())
-  styleId  Int
-  imageUrl String
+  imageId     Int          @id @default(autoincrement())
+  imageUrl    String
+  createdAt   DateTime     @default(now()) // 업로드 시점 저장용 
+  styleImages StyleImage[]
+}
+
+// 중간 테이블
+model StyleImage {
+  styleId Int
+  imageId Int
 
   style Style @relation(fields: [styleId], references: [styleId])
+  image Image @relation(fields: [imageId], references: [imageId])
+
+  @@id([styleId, imageId]) // 복합 PK
 }
 
 model Tag {
