@@ -39,9 +39,9 @@ class ImageUploadController {
       const uploaded = await this.imageService.createImage({
         imageUrl,
       });
-      console.log('🫠 uploaded:', uploaded);
+      // console.log('🫠 uploaded:', uploaded);
 
-      return res.status(201).json({ message: 'Successfully Image uploaded', uploaded });
+      return res.status(200).json({ imageUrl });
     } catch (error) {
       next(`controllerError:`, error);
     }
