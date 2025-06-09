@@ -47,3 +47,65 @@ export const createCommentService = async (req, _res, _next) => {
     nickname: curation.style.nickname,
   };
 };
+
+// 답글 수정
+export const updateCommentService = async (req, _res, _next) => {
+  const { content, password } = req.body;
+  const curationId = Number(req.params.id);
+
+  // 닉네임을 가져오기위해 style을 포함시킵니다.
+  const comment = await db.comment.findFirst({
+    where: { curationId },
+    include: { style: true },
+  });
+
+  if (!comment) {
+    const error = new Error('존재하지 않습니다');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  if (comment.password !== password) {
+    const error = new Error('비밀번호가 틀렸습니다');
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const updated = await db.comment.update({
+    where: { commentId: comment.commentId },
+    data: { content },
+  });
+
+  return {
+    ...updated,
+    nickname: comment.style.nickname,
+  };
+};
+
+// 답글 삭제
+export const deleteCommentService = async (req, _res, _next) => {
+  const { password } = req.body;
+  const curationId = Number(req.params.id);
+
+  const comment = await db.comment.findFirst({
+    where: { curationId },
+  });
+
+  if (!comment) {
+    const error = new Error('존재하지 않습니다');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  if (comment.password !== password) {
+    const error = new Error('비밀번호가 틀렸습니다');
+    error.statusCode = 401;
+    throw error;
+  }
+
+  await db.comment.delete({
+    where: { commentId: comment.commentId },
+  });
+
+  return { message: '답글 삭제 성공' };
+};
