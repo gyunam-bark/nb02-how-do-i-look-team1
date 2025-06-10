@@ -1,11 +1,34 @@
-// input
+const setNestedValue = (obj, path, value) => {
+  const keys = path.split('.');
+  let current = obj;
+  keys.forEach((key, index) => {
+    if (index === keys.length - 1) {
+      current[key] = value;
+    } else {
+      current[key] = current[key] || {};
+      current = current[key];
+    }
+  });
+};
+
+const flattenFields = (obj, prefix = '') => {
+  const result = {};
+  for (const [key, value] of Object.entries(obj)) {
+    const path = prefix ? `${prefix}.${key}` : key;
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      Object.assign(result, flattenFields(value, path));
+    } else {
+      result[path] = value;
+    }
+  }
+  return result;
+};
+
 const createInput = (name, type, group) => {
   const input = document.createElement('input');
-
   input.name = name;
   input.placeholder = `${group}: ${name}`;
   input.dataset.type = group;
-  // object[x] = object[x]
   input.type =
     {
       number: 'number',
@@ -13,11 +36,9 @@ const createInput = (name, type, group) => {
       image: 'file',
       string: 'text',
     }[type] || 'text';
-
   return input;
 };
 
-// form
 const collectFormData = (inputs) => {
   const params = {},
     query = {},
@@ -43,11 +64,11 @@ const collectFormData = (inputs) => {
       if (input.type === 'file' && input.files.length > 0) {
         hasFile = true;
         formData.append(name, input.files[0]);
-      } else if (['tags', 'images'].includes(name)) {
+      } else if (['tags', 'images', 'imageUrls'].includes(name)) {
         const values = value.split(',').map((v) => v.trim());
-        hasFile ? values.forEach((v) => formData.append(name, v)) : (body[name] = values);
+        hasFile ? values.forEach((v) => formData.append(name, v)) : setNestedValue(body, name, values);
       } else {
-        hasFile ? formData.append(name, parseValue()) : (body[name] = parseValue());
+        hasFile ? formData.append(name, parseValue()) : setNestedValue(body, name, parseValue());
       }
     }
   }
@@ -55,7 +76,6 @@ const collectFormData = (inputs) => {
   return { params, query, body, formData, hasFile };
 };
 
-// SUBMIT
 const handleFormSubmit = async (event, endpoint, inputs, responseDiv) => {
   event.preventDefault();
 
@@ -91,7 +111,6 @@ const handleFormSubmit = async (event, endpoint, inputs, responseDiv) => {
   }
 };
 
-// FORM
 export const createMethodForm = (endpoint) => {
   const form = document.createElement('form');
   form.className = 'endpoint';
@@ -110,11 +129,10 @@ export const createMethodForm = (endpoint) => {
 
   ['params', 'query', 'body'].forEach((group) => {
     const fields = endpoint[group];
-    if (!fields) {
-      return;
-    }
+    if (!fields) return;
 
-    for (const [name, type] of Object.entries(fields)) {
+    const flatFields = flattenFields(fields);
+    for (const [name, type] of Object.entries(flatFields)) {
       const input = createInput(name, type, group);
       form.appendChild(input);
       inputs.push(input);
