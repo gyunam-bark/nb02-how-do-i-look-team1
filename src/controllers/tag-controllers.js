@@ -5,8 +5,7 @@ export const handleGetTagList = async (_req, res, next) => {
     const tagList = await getTagList();
 
     res.status(200).json({
-      success: true,
-      data: tagList,
+      ...tagList,
     });
   } catch (error) {
     next(error);
