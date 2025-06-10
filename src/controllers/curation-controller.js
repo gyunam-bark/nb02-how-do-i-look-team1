@@ -26,12 +26,12 @@ export class CurationController {
     }
 
     // 큐레이팅 목록 조회 (GET /curations/styles/:styleId)
-    static async getCurationsByStyleId(req, res, next) {
+    static async getCurationList(req, res, next) {
         try {
             const { styleId } = req.params;
             const { page, pageSize, searchBy, keyword } = req.query;
 
-            const curationsData = await getCurationsByStyleIdService({
+            const curationsData = await getCurationListService({
                 styleId,
                 page,
                 pageSize,
