@@ -1,11 +1,28 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
+// 태그 name 배열을 받아 findOrCreate 후 [{tagId}] 배열 반환
+async function getOrCreateTagIds(tagNames = []) {
+  const tagObjs = [];
+  for (let name of tagNames) {
+    const cleanName = name.trim();
+    let tag = await prisma.tag.findUnique({ where: { name: cleanName } });
+    if (!tag) {
+      tag = await prisma.tag.create({ data: { name: cleanName } });
+    }
+    tagObjs.push({ tagId: tag.tagId });
+  }
+  return tagObjs;
+}
+
 export class StyleController {
   // 스타일 등록
   static async createStyle(req, res, next) {
     try {
-      const { nickname, title, content, password, categories, tags, images } = req.body;
+      const { nickname, title, content, password, categories, tags = [], images } = req.body;
+
+      // tags: name 배열 → tagId 배열 변환
+      const tagObjs = await getOrCreateTagIds(tags);
 
       const newStyle = await prisma.style.create({
         data: {
@@ -13,15 +30,9 @@ export class StyleController {
           title,
           content,
           password,
-          categories: {
-            create: categories || [],
-          },
-          styleTags: {
-            create: tags?.map(({ tagId }) => ({ tagId })),
-          },
-          images: {
-            create: images?.map(({ url }) => ({ imageUrl: url })),
-          },
+          categories: { create: categories || [] },
+          styleTags: { create: tagObjs }, // [{tagId}, ...]
+          images: { create: images?.map(({ url }) => ({ imageUrl: url })) || [] },
         },
         include: {
           categories: true,
@@ -116,21 +127,24 @@ export class StyleController {
   static async updateStyle(req, res, next) {
     try {
       const { styleId } = req.params;
-      const { password, title, content, categories, tags, images } = req.body;
+      const { password, title, content, categories, tags = [], images } = req.body;
 
       const style = await prisma.style.findUnique({ where: { styleId: +styleId } });
       if (!style) return res.status(404).json({ message: '스타일을 찾을 수 없습니다.' });
       if (style.password !== password) return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
 
-      // 기존 연결 데이터(카테고리, 태그, 이미지) 삭제 후 재생성 방식(단순)
+      // tags: name 배열 → tagId 배열 변환
+      const tagObjs = await getOrCreateTagIds(tags);
+
+      // 기존 연결 데이터 삭제 후 재생성 방식
       const updatedStyle = await prisma.style.update({
         where: { styleId: +styleId },
         data: {
           title,
           content,
           categories: { deleteMany: {}, create: categories || [] },
-          styleTags: { deleteMany: {}, create: (tags || []).map(({ tagId }) => ({ tagId })) },
-          images: { deleteMany: {}, create: (images || []).map(({ url }) => ({ imageUrl: url })) },
+          styleTags: { deleteMany: {}, create: tagObjs },
+          images: { deleteMany: {}, create: images?.map(({ url }) => ({ imageUrl: url })) || [] },
           updatedAt: new Date(),
         },
         include: {
