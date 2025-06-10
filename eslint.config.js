@@ -12,7 +12,7 @@ export default defineConfig([
     },
     languageOptions: {
       ecmaVersion: 'latest',
-      sourceType: 'module',
+      sourceType: ['script', 'module'],
       globals: {
         ...globals.node,
       },
