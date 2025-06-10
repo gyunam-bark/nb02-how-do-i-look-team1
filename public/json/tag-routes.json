@@ -1,0 +1,12 @@
+{
+  "name": "Tag",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/tags",
+      "body": {
+       
+      }
+    }
+  ]
+}
