@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "reset": "npx prisma migrate reset -f",
-    "migrate":"npx prisma migrate dev",
+    "migrate": "npx prisma migrate dev",
     "dev": "nodemon index.js",
     "start": "node index.js",
     "lint": "eslint .",
@@ -33,7 +33,8 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "multer": "^2.0.0"
+    "multer": "^2.0.0",
+    "superstruct": "^2.0.2"
   },
   "type": "module",
   "devDependencies": {
