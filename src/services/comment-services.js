@@ -38,7 +38,6 @@ export const createCommentService = async (req, _res, _next) => {
       content,
       password,
       curation: { connect: { curationId } },
-      style: { connect: { styleId: curation.style.styleId } },
     },
   });
 
@@ -56,7 +55,11 @@ export const updateCommentService = async (req, _res, _next) => {
   // 닉네임을 가져오기위해 style을 포함시킵니다.
   const comment = await db.comment.findFirst({
     where: { curationId },
-    include: { style: true },
+    include: {
+      curation: {
+        include: { style: true },
+      },
+    },
   });
 
   if (!comment) {
@@ -78,7 +81,7 @@ export const updateCommentService = async (req, _res, _next) => {
 
   return {
     ...updated,
-    nickname: comment.style.nickname,
+    nickname: comment.curation.style.nickname,
   };
 };
 
