@@ -4,6 +4,8 @@ import cors from 'cors';
 import fs from 'fs';
 
 import styleRouter from './routes/style-routes.js';
+
+import curationRouter from './routes/curation-routes.js';
 import imageRouter from './routes/image-route.js';
 import comment from './routes/comment-routes.js';
 import tagRouter from './routes/tag-routers.js';
@@ -49,6 +51,7 @@ export default class Server {
     this.#app.use('/ranking', rankRouter);
     this.#app.use('/tags', tagRouter);
     this.#app.use('/styles', styleRouter);
+    this.#app.use('/curations', curationRouter); 
     this.#app.use(comment);
   }
 
