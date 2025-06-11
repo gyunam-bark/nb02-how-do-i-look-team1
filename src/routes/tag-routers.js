@@ -1,8 +1,8 @@
 import express from 'express';
-import { handleGetTagList } from '../controllers/tag-controllers.js';
+import TagController from '../controllers/tag-controllers.js';
 
 const tagRouter = express.Router();
 
-tagRouter.get('/', handleGetTagList);
+tagRouter.get('/', TagController.handleGetTagList);
 
 export default tagRouter;
