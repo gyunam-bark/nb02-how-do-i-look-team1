@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import ImageUploadService from '../services/image-service.js';
-import uploadsDir from '../config/uploads-path.js';
+import bucket from '../config/firebase-admin.js';
 
 class ImageUploadController {
   constructor() {
@@ -27,23 +27,35 @@ class ImageUploadController {
 
       // 중복 방지위해 timestamp 추가
       const timestamp = Date.now();
-      const newFileName = `${safeBaseName}+${timestamp}${ext}`;
-      const newPath = path.join(uploadsDir, newFileName);
+      const firebaseFileName = `${safeBaseName}_${timestamp}${ext}`;
+      const destination = `images/${firebaseFileName}`; // Firebase 내 경로
 
-      // 파일 이동
-      fs.renameSync(tempPath, newPath);
+      // Firebase에 업로드
+      await bucket.upload(tempPath, {
+        destination,
+        metadata: {
+          contentType: file.mimetype,
+        },
+      });
 
-      const imageUrl = `images/upload/${newFileName}`;
+      // 임시 파일 삭제
+      fs.unlinkSync(tempPath);
+
+      // 공개 URL 생성
+      const fileRef = bucket.file(destination);
+      const [url] = await fileRef.getSignedUrl({
+        action: 'read',
+        expires: '03-01-2500',
+      });
 
       // DB 저장
       const uploaded = await this.imageService.createImage({
-        imageUrl,
+        imageUrl: url,
       });
-      // console.log('🫠 uploaded:', uploaded);
 
-      return res.status(200).json({ imageUrl });
+      return res.status(200).json({ imageUrl: uploaded.imageUrl });
     } catch (error) {
-      next(`controllerError:`, error);
+      next(error);
     }
   }
 }
