@@ -1,24 +1,29 @@
 import admin from 'firebase-admin';
-import { readFileSync } from 'fs';
+
+if (!process.env.FIREBASE_CONFIG) {
+  console.error('.env에 FIREBASE_CONFIG 내용 없음');
+  process.exit(1);
+}
 
 let serviceAccount;
 
-// 로컬에서 파일, 배포에서 환경 변수 사용 가능
-if (process.env.NODE_ENV === 'production') {
+try {
   serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
-  if (serviceAccount.private_key) {
+
+  // 줄바꿈 복원
+  if (typeof serviceAccount.private_key === 'string') {
     serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
   }
-} else {
-  serviceAccount = JSON.parse(readFileSync('firebase-service-account.json', 'utf8'));
+} catch (error) {
+  console.error('FIREBASE_CONFIG 파싱 실패:', error);
 }
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  storageBucket: 'gs://nb02-how-do-i-look-storage.firebasestorage.app',
-});
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: 'gs://nb02-how-do-i-look-storage.firebasestorage.app',
+  });
+}
 
 const bucket = admin.storage().bucket();
-const [exists] = await bucket.exists();
-console.log(`버킷 존재함?:`, exists);
 export default bucket;
