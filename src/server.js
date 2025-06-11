@@ -38,7 +38,7 @@ export default class Server {
     this.#app.use(cors());
     this.#app.use(morgan('dev'));
     this.#app.use(express.json());
-    this.#app.use(express.urlencoded());
+    this.#app.use(express.urlencoded({ extended: true }));
 
     // 정적 파일 제공
     this.#app.use('/images/upload', express.static(uploadsDir));
