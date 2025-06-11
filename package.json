@@ -8,9 +8,12 @@
   "main": "index.js",
   "scripts": {
     "reset": "npx prisma migrate reset -f",
-    "migrate":"npx prisma migrate dev",
+    "migrate": "npx prisma migrate dev",
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write ."
   },
   "repository": {
     "type": "git",
@@ -28,6 +31,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "firebase-admin": "^13.4.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "multer": "^2.0.0"

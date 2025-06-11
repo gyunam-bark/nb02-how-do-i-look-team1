@@ -4,13 +4,16 @@ import cors from 'cors';
 import fs from 'fs';
 
 import styleRouter from './routes/style-routes.js';
+
+import curationRouter from './routes/curation-routes.js';
 import imageRouter from './routes/image-route.js';
 import comment from './routes/comment-routes.js';
 import tagRouter from './routes/tag-routers.js';
-import rankRouter from './routes/rank-route.js'
+import rankRouter from './routes/rank-route.js';
 
 import errorHandler from './middlewares/error-middleware.js';
 import uploadsDir from './config/uploads-path.js';
+import rootRouter from './routes/root-routes.js';
 
 export default class Server {
   #app;
@@ -43,10 +46,12 @@ export default class Server {
   // 라우터 등록
   // this.#app.use('/api/users', userRouter);
   #initializeRouters() {
+    this.#app.use('/', rootRouter);
     this.#app.use('/images', imageRouter);
-    this.#app.use('/ranking', rankRouter)
+    this.#app.use('/ranking', rankRouter);
     this.#app.use('/tags', tagRouter);
     this.#app.use('/styles', styleRouter);
+    this.#app.use('/curations', curationRouter); 
     this.#app.use(comment);
   }
 
