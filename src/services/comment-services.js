@@ -3,7 +3,7 @@ import db from '../config/db.js';
 // 답글 등록
 export const createCommentService = async (req, _res, _next) => {
   const { password, content } = req.body;
-  const curationId = Number(req.params.id);
+  const curationId = Number(req.params.curationId);
 
   // style 비밀번호를 참조하기위해 stlye을 포함시킵니다.
   const curation = await db.curation.findUnique({
@@ -50,11 +50,11 @@ export const createCommentService = async (req, _res, _next) => {
 // 답글 수정
 export const updateCommentService = async (req, _res, _next) => {
   const { content, password } = req.body;
-  const curationId = Number(req.params.id);
+  const commentId = Number(req.params.commentId);
 
   // 닉네임을 가져오기위해 style을 포함시킵니다.
   const comment = await db.comment.findFirst({
-    where: { curationId },
+    where: { commentId },
     include: {
       curation: {
         include: { style: true },
@@ -88,10 +88,10 @@ export const updateCommentService = async (req, _res, _next) => {
 // 답글 삭제
 export const deleteCommentService = async (req, _res, _next) => {
   const { password } = req.body;
-  const curationId = Number(req.params.id);
+  const commentId = Number(req.params.commentId);
 
   const comment = await db.comment.findFirst({
-    where: { curationId },
+    where: { commentId },
   });
 
   if (!comment) {
