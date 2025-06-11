@@ -110,7 +110,7 @@ export class StyleController {
   }
 
   // 스타일 목록 조회
-  static async getStyles(req, res, next) {
+  static async getStyleList(req, res, next) {
     try {
       const { page = 1, pageSize = 10, sort = 'latest', search } = req.query;
 
