@@ -7,7 +7,7 @@ export class CommentController {
       const { password, content } = req.validated.body;
       const { curationId } = req.validated.params;
 
-      const comment = await createCommentService({password, content, curationId});
+      const comment = await createCommentService({ password, content, curationId });
 
       res.status(201).json({
         id: comment.commentId,
@@ -26,7 +26,7 @@ export class CommentController {
       const { content, password } = req.validated.body;
       const { commentId } = req.validated.params;
 
-      const updated = await updateCommentService({content, password, commentId});
+      const updated = await updateCommentService({ content, password, commentId });
 
       res.status(200).json({
         id: updated.commentId,
@@ -45,7 +45,7 @@ export class CommentController {
       const { password } = req.validated.body;
       const { commentId } = req.validated.params;
 
-      const deleted = await deleteCommentService({password, commentId});
+      const deleted = await deleteCommentService({ password, commentId });
 
       res.status(200).json(deleted);
     } catch (err) {
