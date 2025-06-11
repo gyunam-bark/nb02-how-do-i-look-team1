@@ -7,7 +7,7 @@ class RankController {
 
   async getRankingList(req, res, next) {
     try {
-      const { page = 1, pageSize = 10, rankBy = 'total' } = req.query;
+      const { page = 1, pageSize = 10, rankBy = 'total' } = req.validated.query;
 
       const validRankBy = ['total', 'trendy', 'personality', 'practicality', 'costEffectiveness'];
       if (!validRankBy.includes(rankBy)) {
