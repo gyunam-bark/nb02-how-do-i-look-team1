@@ -44,13 +44,13 @@ model Curation {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  style    Style     @relation(fields: [styleId], references: [styleId])
-  comments Comment[]
+  style    Style    @relation(fields: [styleId], references: [styleId])
+  comments Comment?
 }
 
 model Comment {
   commentId  Int      @id @default(autoincrement())
-  curationId Int
+  curationId Int      @unique
   content    String
   password   String
   createdAt  DateTime @default(now())

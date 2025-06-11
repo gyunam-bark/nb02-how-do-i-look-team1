@@ -7,7 +7,7 @@ import styleRouter from './routes/style-routes.js';
 
 import curationRouter from './routes/curation-routes.js';
 import imageRouter from './routes/image-route.js';
-import comment from './routes/comment-routes.js';
+import commentRouter from './routes/comment-routes.js';
 import tagRouter from './routes/tag-routers.js';
 import rankRouter from './routes/rank-route.js';
 
@@ -38,6 +38,7 @@ export default class Server {
     this.#app.use(cors());
     this.#app.use(morgan('dev'));
     this.#app.use(express.json());
+    this.#app.use(express.urlencoded({ extended: true }));
 
     // 정적 파일 제공
     this.#app.use('/images/upload', express.static(uploadsDir));
@@ -51,8 +52,8 @@ export default class Server {
     this.#app.use('/ranking', rankRouter);
     this.#app.use('/tags', tagRouter);
     this.#app.use('/styles', styleRouter);
-    this.#app.use('/curations', curationRouter); 
-    this.#app.use(comment);
+    this.#app.use('/curations', curationRouter);
+    this.#app.use('/comments', commentRouter);
   }
 
   // 에러 핸들러 등록

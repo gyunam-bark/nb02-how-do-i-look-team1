@@ -34,7 +34,8 @@
     "firebase-admin": "^13.4.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "multer": "^2.0.0"
+    "multer": "^2.0.0",
+    "superstruct": "^2.0.2"
   },
   "type": "module",
   "devDependencies": {
