@@ -9,51 +9,58 @@ class ImageUploadController {
   }
 
   async uploadImage(req, res, next) {
+    console.log('FILES:', req.files);
     try {
-      const file = req.file;
+      const files = req.files;
 
-      if (!file) {
+      if (!files) {
         return res.status(400).json({ error: '이미지 파일이 필요합니다.' });
       }
 
-      const { originalname, path: tempPath } = file;
+      const uploadedImages = [];
 
-      // 원래 이름과 확장자 분리
-      const ext = path.extname(originalname);
-      const baseName = path.basename(originalname, ext);
+      for (const file of files) {
+        const { originalname, path: tempPath, mimetype } = file;
 
-      // 공백, 특수문자 제거 (파일 이름으로 안전하게 만들기)
-      const safeBaseName = baseName.replace(/[^a-zA-Z0-9_-]/g, '_');
+        // 원래 이름과 확장자 분리
+        const ext = path.extname(originalname);
+        const baseName = path.basename(originalname, ext);
 
-      // 중복 방지위해 timestamp 추가
-      const timestamp = Date.now();
-      const firebaseFileName = `${safeBaseName}_${timestamp}${ext}`;
-      const destination = `images/${firebaseFileName}`; // Firebase 내 경로
+        // 공백, 특수문자 제거 (파일 이름으로 안전하게 만들기)
+        const safeBaseName = baseName.replace(/[^a-zA-Z0-9_-]/g, '_');
 
-      // Firebase에 업로드
-      await bucket.upload(tempPath, {
-        destination,
-        metadata: {
-          contentType: file.mimetype,
-        },
-      });
+        // 중복 방지위해 timestamp 추가
+        const timestamp = Date.now();
+        const firebaseFileName = `${safeBaseName}_${timestamp}${ext}`;
+        const destination = `images/${firebaseFileName}`; // Firebase 내 경로
 
-      // 임시 파일 삭제
-      fs.unlinkSync(tempPath);
+        // Firebase에 업로드
+        await bucket.upload(tempPath, {
+          destination,
+          metadata: {
+            contentType: file.mimetype,
+          },
+        });
 
-      // 공개 URL 생성
-      const fileRef = bucket.file(destination);
-      const [url] = await fileRef.getSignedUrl({
-        action: 'read',
-        expires: '03-01-2500',
-      });
+        // 임시 파일 삭제
+        fs.unlinkSync(tempPath);
 
-      // DB 저장
-      const uploaded = await this.imageService.createImage({
-        imageUrl: url,
-      });
+        // 공개 URL 생성
+        const fileRef = bucket.file(destination);
+        const [url] = await fileRef.getSignedUrl({
+          action: 'read',
+          expires: '03-01-2500',
+        });
 
-      return res.status(200).json({ imageUrl: uploaded.imageUrl });
+        // DB 저장
+        const uploaded = await this.imageService.createImage({
+          imageUrl: url,
+        });
+
+        uploadedImages.push(uploaded.imageUrl);
+      }
+
+      return res.status(200).json({ imageUrl: uploadedImages });
     } catch (error) {
       next(error);
     }
