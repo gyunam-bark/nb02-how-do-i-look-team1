@@ -6,10 +6,14 @@ import { object, optional, string, size, coerce, number, enums, min, array, crea
 const ID_MIN = 1;
 const PAGE_MIN = 1;
 const PAGE_SIZE_MIN = 0;
-const SORT_BY_ENUMS = {
+const SORT_BY_STYLE_ENUMS = {
   LATEST: 'latest',
   MOST_VIEWED: 'mostViewed',
   MOST_CURATED: 'mostCurated',
+};
+const SORT_BY_LOG_ENUMS = {
+  LATEST: 'latest',
+  OLDEST: 'oldest',
 };
 const SEARCH_BY_STYLE_ENUMS = {
   NICKNAME: 'nickname',
@@ -20,6 +24,13 @@ const SEARCH_BY_STYLE_ENUMS = {
 const SEARCH_BY_CURATION_ENUMS = {
   NICKNAME: 'nickname',
   CONTENT: 'content',
+};
+const SEARCH_BY_LOG_ENUMS = {
+  MESSAGE: 'message',
+  METHOD: 'method',
+  ENDPOINT: 'endpoint',
+  STATUS_CODE: 'statusCode',
+  CREATED_AT: 'createdAt',
 };
 const RANK_BY_ENUMS = {
   TOTAL: 'total',
@@ -75,9 +86,11 @@ const integer = coerce(number(), string(), stringToInteger);
 const id = min(integer, ID_MIN);
 const page = min(integer, PAGE_MIN);
 const pageSize = min(integer, PAGE_SIZE_MIN);
-const sortBy = enums(Object.values(SORT_BY_ENUMS));
+const sortByStyle = enums(Object.values(SORT_BY_STYLE_ENUMS));
+const sortByLog = enums(Object.values(SORT_BY_LOG_ENUMS));
 const searchByStyle = enums(Object.values(SEARCH_BY_STYLE_ENUMS));
 const searchByCuration = enums(Object.values(SEARCH_BY_CURATION_ENUMS));
+const searchByLog = enums(Object.values(SEARCH_BY_LOG_ENUMS));
 const rankBy = enums(Object.values(RANK_BY_ENUMS));
 const keyword = size(string(), KEYWORD_MIN, KEYWORD_MAX);
 const tag = size(string(), TAG_MIN, TAG_MAX);
@@ -135,7 +148,7 @@ export const getStyleListSchema = {
   query: object({
     page: optional(page),
     pageSize: optional(pageSize),
-    sortBy: optional(sortBy),
+    sortBy: optional(sortByStyle),
     searchBy: optional(searchByStyle),
     keyword: optional(keyword),
     tag: optional(tag),
@@ -260,6 +273,18 @@ export const deleteCommentSchema = {
   params: object({
     commentId: id,
   }),
+};
+// GET:LOG_LIST
+export const getLogListSchema = {
+  body: object({}),
+  query: object({
+    page: optional(page),
+    pageSize: optional(pageSize),
+    sortBy: optional(sortByLog),
+    searchBy: optional(searchByLog),
+    keyword: optional(keyword),
+  }),
+  params: object({}),
 };
 
 // ----------------------------------------------------------

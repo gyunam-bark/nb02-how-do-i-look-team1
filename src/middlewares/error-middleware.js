@@ -1,3 +1,5 @@
+import db from '../config/db.js';
+
 // 상태 코드에 따른 메시지 정의 객체
 // API 명세서에 정의된 상태 코드(400, 403, 404)
 // 나머지는 MDN 을 바탕으로 정의합니다.
@@ -90,8 +92,24 @@ const responseErrorService = (res = {}, statusCode = 500, message = '') => {
   res.status(statusCode).json(response);
 };
 
+const saveLogToDatabse = async (req = {}, statusCode = '', message = '') => {
+  const endpoint = req.originalUrl || req.url || 'unknown';
+  const method = req.method;
+  const params = req.validated ?? {};
+  const ip = req.ip || req.headers['x-forwarded-for'];
+  const detail = {
+    endpoint,
+    method,
+    params,
+    statusCode: String(statusCode),
+    message,
+  };
+
+  await db.log.create({ data: { ip, detail } });
+};
+
 // 글로벌 에러 핸들러
-const errorHandler = (error, req, res, _next) => {
+const errorHandler = async (error, req, res, _next) => {
   let statusCode = error.statusCode || 500;
 
   // 비정상적인 statusCode 처리
@@ -104,6 +122,9 @@ const errorHandler = (error, req, res, _next) => {
   // 기존 message 가 있는 경우에도 덮어씌웁니다.
   // 예외사항은 없어야 하지만 혹시 모르기 때문에 기본값을 지정합니다.
   const message = statusMessages[statusCode] || '서버 오류가 발생했습니다';
+
+  // LOG 저장
+  await saveLogToDatabse(req, statusCode, message);
 
   // DEV 로그
   responseErrorDev(error, req, statusCode, message);

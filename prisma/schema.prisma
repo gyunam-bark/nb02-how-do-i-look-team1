@@ -114,3 +114,10 @@ model StyleTag {
 
   @@id([styleId, tagId]) // 복합 PK
 }
+
+model Log {
+  logId     Int      @id @default(autoincrement())
+  ip        String
+  detail    Json // { endpoint, method, params, statusCode, message }
+  createdAt DateTime @default(now())
+}
