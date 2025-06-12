@@ -4,11 +4,10 @@ import cors from 'cors';
 import fs from 'fs';
 
 import styleRouter from './routes/style-route.js';
-
 import curationRouter from './routes/curation-routes.js';
 import imageRouter from './routes/image-route.js';
 import commentRouter from './routes/comment-route.js';
-import tagRouter from './routes/tag-routers.js';
+import tagRouter from './routes/tag-router.js';
 import rankRouter from './routes/rank-route.js';
 
 import errorHandler from './middlewares/error-middleware.js';
