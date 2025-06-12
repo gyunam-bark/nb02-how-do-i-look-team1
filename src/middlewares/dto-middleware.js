@@ -28,11 +28,11 @@ const RANK_BY_ENUMS = {
   PRACTICALITY: 'practicality',
   COST_EFFECTIVENESS: 'costEffectiveness',
 };
-const KEYWORD_MIN = 1;
+const KEYWORD_MIN = 0;
 const KEYWORD_MAX = 32;
 const NICKNAME_MIN = 1;
 const NICKNAME_MAX = 32;
-const TAG_MIN = 1;
+const TAG_MIN = 0;
 const TAG_MAX = 16;
 const TITLE_MIN = 1;
 const TITLE_MAX = 64;
