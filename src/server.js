@@ -3,7 +3,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import fs from 'fs';
 
-import styleRouter from './routes/style-routes.js';
+import styleRouter from './routes/style-route.js';
 
 import curationRouter from './routes/curation-routes.js';
 import imageRouter from './routes/image-route.js';
