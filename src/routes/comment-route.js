@@ -1,5 +1,5 @@
 import Router from 'express';
-import { CommentController } from '../controllers/comment-controllers.js';
+import { CommentController } from '../controllers/comment-controller.js';
 import { validateRequest, updateCommentSchema, deleteCommentSchema } from '../middlewares/dto-middleware.js';
 
 const router = Router();

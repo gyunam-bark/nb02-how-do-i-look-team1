@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { CurationController } from '../controllers/curation-controller.js';
-import { CommentController } from '../controllers/comment-controllers.js';
+import { CommentController } from '../controllers/comment-controller.js';
 import { validateRequest, createCommentSchema } from '../middlewares/dto-middleware.js';
 
 const router = Router();

@@ -9,13 +9,13 @@ export const createCommentService = async ({ password, content, curationId }) =>
   });
 
   if (!curation) {
-    const error = new Error('큐레이션이 존재하지 않습니다.');
+    const error = new Error('존재하지 않습니다');
     error.statusCode = 404;
     throw error;
   }
 
   if (curation.style.password !== password) {
-    const error = new Error('비밀번호가 일치하지 않습니다.');
+    const error = new Error('비밀번호가 틀렸습니다');
     error.statusCode = 401;
     throw error;
   }
@@ -25,7 +25,7 @@ export const createCommentService = async ({ password, content, curationId }) =>
   });
 
   if (existing) {
-    const error = new Error('이미 댓글이 존재합니다.');
+    const error = new Error('이미 댓글이 존재합니다');
     error.statusCode = 409;
     throw error;
   }
@@ -81,8 +81,6 @@ export const updateCommentService = async ({ content, password, commentId }) => 
 
 // 답글 삭제
 export const deleteCommentService = async ({ password, commentId }) => {
- 
-
   const comment = await db.comment.findFirst({
     where: { commentId },
   });
