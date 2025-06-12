@@ -1,5 +1,5 @@
 import express from 'express';
-import TagController from '../controllers/tag-controllers.js';
+import TagController from '../controllers/tag-controller.js';
 
 const tagRouter = express.Router();
 
