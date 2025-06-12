@@ -1,7 +1,6 @@
-// src/services/curation-service.js
-
 import db from '../config/db.js';
 
+// [수정] 함수명 원상 복구 (Service 접미사 추가)
 export const createCurationService = async ({
   styleId,
   nickname,
@@ -18,10 +17,10 @@ export const createCurationService = async ({
   });
 
   if (!existingStyle) {
-    throw new Error('해당 스타일을 찾을 수 없습니다.'); // (TODO) HTTP 상태 코드 정보
+    throw new Error('해당 스타일을 찾을 수 없습니다.');
   }
 
-  // 2. 큐레이션 데이터 생성
+  // 2. 큐레이션 데이터 생성 (포맷팅 없이 Prisma 원본 객체 반환)
   const newCuration = await db.curation.create({
     data: {
       styleId: +styleId,
@@ -35,17 +34,7 @@ export const createCurationService = async ({
     },
   });
 
-  // 3. 생성된 큐레이션 정보 반환
-  return {
-    id: newCuration.curationId,
-    nickname: newCuration.nickname,
-    content: newCuration.content,
-    trendy: newCuration.trendy,
-    personality: newCuration.personality,
-    practicality: newCuration.practicality,
-    costEffectiveness: newCuration.costEffectiveness,
-    createdAt: newCuration.createdAt,
-  };
+  return newCuration;
 };
 
 export const getCurationListService = async ({ styleId, page, pageSize, searchBy, keyword }) => {
@@ -53,10 +42,9 @@ export const getCurationListService = async ({ styleId, page, pageSize, searchBy
   const parsedPageSize = parseInt(pageSize || 10);
 
   if (parsedPage < 1 || parsedPageSize < 1) {
-    throw new Error('페이지 및 페이지 크기는 1 이상의 유효한 숫자여야 합니다.', 400);
+    throw new Error('페이지 및 페이지 크기는 1 이상의 유효한 숫자여야 합니다.');
   }
 
-  // 1. 스타일 존재 여부 확인
   const existingStyle = await db.style.findUnique({
     where: { styleId: +styleId },
   });
@@ -68,15 +56,15 @@ export const getCurationListService = async ({ styleId, page, pageSize, searchBy
   let where = { styleId: +styleId };
   if (searchBy && keyword) {
     if (searchBy === 'nickname') {
-      where.nickname = { contains: keyword };
+      where.nickname = { contains: keyword, mode: 'insensitive' };
     } else if (searchBy === 'content') {
-      where.content = { contains: keyword };
+      where.content = { contains: keyword, mode: 'insensitive' };
     } else {
-      throw new Error('유효하지 않은 검색 기준입니다.', 400);
+      throw new Error('유효하지 않은 검색 기준입니다.');
     }
   }
 
-  // 3. 총 아이템 개수 및 큐레이션 목록 조회
+  // 3. 총 아이템 개수 및 큐레이션 목록 조회 
   const [totalItemCount, curations] = await Promise.all([
     db.curation.count({ where }),
     db.curation.findMany({
@@ -85,7 +73,7 @@ export const getCurationListService = async ({ styleId, page, pageSize, searchBy
       take: parsedPageSize,
       orderBy: { createdAt: 'desc' },
       include: {
-        comments: true, // 큐레이션에 남겨진 답글도 함께 조회
+        comments: true, 
       },
     }),
   ]);
@@ -93,33 +81,12 @@ export const getCurationListService = async ({ styleId, page, pageSize, searchBy
   // 4. 총 페이지 수 계산
   const totalPages = Math.ceil(totalItemCount / parsedPageSize);
 
-  // 5. 큐레이션 목록 데이터 포맷팅
-  const formattedCurations = curations.map((curation) => ({
-    id: curation.curationId,
-    nickname: curation.nickname,
-    content: curation.content,
-    trendy: curation.trendy,
-    personality: curation.personality,
-    practicality: curation.practicality,
-    costEffectiveness: curation.costEffectiveness,
-    createdAt: curation.createdAt,
-    comment:
-      curation.comments.length > 0
-        ? {
-            id: curation.comments[0].commentId,
-            nickname: curation.comments[0].nickname,
-            content: curation.comments[0].content,
-            createdAt: curation.comments[0].createdAt,
-          }
-        : {},
-  }));
-
-  // 6. 페이지네이션 정보와 함께 포맷팅된 데이터 반환
+  // 5. 페이지네이션 정보와 함께 원본 데이터 반환
   return {
     currentPage: parsedPage,
     totalPages,
     totalItemCount,
-    data: formattedCurations,
+    data: curations,
   };
 };
 
@@ -127,7 +94,7 @@ export const updateCurationService = async (
   curationId,
   { password, trendy, personality, practicality, costEffectiveness, content, nickname }
 ) => {
-  // 1. 큐레이션 존재 여부 확인
+  // 1. 큐레이팅 존재 여부 확인
   const existingCuration = await db.curation.findUnique({
     where: { curationId: +curationId },
   });
@@ -136,15 +103,15 @@ export const updateCurationService = async (
     throw new Error('큐레이팅을 찾을 수 없습니다.');
   }
   // 2. 비밀번호 일치 확인
-  if (existingCuration && existingCuration.password !== password) {
-    throw new Error('비밀번호가 일치하지 않습니다.', 403);
+  if (existingCuration.password !== password) {
+    throw new Error('비밀번호가 일치하지 않습니다.');
   }
 
-  // 3. 큐레이션 데이터 업데이트
+  // 3. 큐레이팅 데이터 업데이트
   const updatedCuration = await db.curation.update({
     where: { curationId: +curationId },
     data: {
-      nickname: nickname || existingCuration?.nickname,
+      nickname: nickname !== undefined ? nickname : existingCuration.nickname,
       trendy: +trendy,
       personality: +personality,
       practicality: +practicality,
@@ -154,21 +121,11 @@ export const updateCurationService = async (
     },
   });
 
-  // 4. 업데이트된 큐레이션 정보 반환
-  return {
-    id: updatedCuration.curationId,
-    nickname: updatedCuration.nickname,
-    content: updatedCuration.content,
-    trendy: updatedCuration.trendy,
-    personality: updatedCuration.personality,
-    practicality: updatedCuration.practicality,
-    costEffectiveness: updatedCuration.costEffectiveness,
-    createdAt: updatedCuration.createdAt,
-  };
+  return updatedCuration;
 };
 
 export const deleteCurationService = async (curationId, password) => {
-  // 1. 큐레이션 존재 여부 확인
+  // 1. 큐레이팅 존재 여부 확인
   const existingCuration = await db.curation.findUnique({
     where: { curationId: +curationId },
   });
@@ -178,13 +135,13 @@ export const deleteCurationService = async (curationId, password) => {
   }
 
   // 2. 비밀번호 일치 확인
-  if (existingCuration && existingCuration.password !== password) {
-    throw new Error('비밀번호가 일치하지 않습니다.', 403);
+  if (existingCuration.password !== password) {
+    throw new Error('비밀번호가 일치하지 않습니다.');
   }
 
-  // 3. 큐레이션 삭제
+  // 3. 큐레이팅 삭제
   await db.curation.delete({ where: { curationId: +curationId } });
 
-  // 4. 삭제 성공 메시지 반환
+  // 4. 삭제 성공 메시지 반환 
   return { message: '큐레이팅 삭제 성공' };
 };

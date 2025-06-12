@@ -6,7 +6,9 @@ import {
   getStyleListSchema,
   getStyleDetailSchema,
   updateStyleSchema,
-  deleteStyleSchema
+  deleteStyleSchema,
+  createCurationSchema, 
+  getCurationListSchema
 } from '../middlewares/dto-middleware.js';
 
 const router = Router();
@@ -16,6 +18,9 @@ router.get('/', validateRequest(getStyleListSchema), StyleController.getStyleLis
 router.get('/:styleId', validateRequest(getStyleDetailSchema), StyleController.getStyleDetail);   // 상세
 router.put('/:styleId', validateRequest(updateStyleSchema), StyleController.updateStyle);          // 수정
 router.delete('/:styleId', validateRequest(deleteStyleSchema), StyleController.deleteStyle);       // 삭제
+
+router.post('/:styleId/curations', validateRequest(createCurationSchema), StyleController.createCuration);
+router.get('/:styleId/curations', validateRequest(getCurationListSchema), StyleController.getCurationList);
 
 export default router;
 
