@@ -275,4 +275,56 @@ export class StyleController {
       next(err);
     }
   }
-}
+  
+  static async createCuration(req, res, next) {
+    try {
+      const { styleId } = req.params;
+      const { nickname, password, trendy, personality, practicality, costEffectiveness, content } = req.body;
+
+      // 서비스 함수 호출
+      const newCuration = await createCurationForStyle({
+        styleId: +styleId, 
+        nickname,
+        password,
+        trendy,
+        personality,
+        practicality,
+        costEffectiveness,
+        content,
+      });
+
+      res.status(201).json(newCuration); 
+    } catch (err) {
+      if (err.message === '스타일을 찾을 수 없습니다.') {
+        return res.status(404).json({ message: err.message });
+      }
+      next(err);
+    }
+  }
+
+  // 스타일에 대한 큐레이션 목록 조회 (GET /styles/:styleId/curations)
+  static async getCurationList(req, res, next) {
+    try {
+      const { styleId } = req.params;
+      const { page, pageSize, searchBy, keyword } = req.query;
+
+      const curationsData = await getCurationListForStyle({
+        styleId: +styleId,
+        page,
+        pageSize,
+        searchBy,
+        keyword,
+      });
+
+      res.status(200).json(curationsData); 
+    } catch (err) {
+      if (err.message === '페이지 및 페이지 크기는 1 이상의 유효한 숫자여야 합니다.' || err.message === '유효하지 않은 검색 기준입니다.') {
+        return res.status(400).json({ message: err.message });
+      }
+      if (err.message === '스타일을 찾을 수 없습니다.') {
+        return res.status(404).json({ message: err.message });
+      }
+      next(err);
+    }
+  }
+}  

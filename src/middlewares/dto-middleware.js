@@ -157,7 +157,14 @@ export const getStyleListSchema = {
 };
 // PUT:STYLE
 export const updateStyleSchema = {
-  body: object({}),
+  body: object({
+    password: password,
+    title: optional(title),
+    content: optional(content),
+    categories: optional(categories),
+    tags: optional(tags),
+    imageUrls: optional(imageUrls), 
+  }),
   query: object({}),
   params: object({
     styleId: id,
@@ -165,7 +172,9 @@ export const updateStyleSchema = {
 };
 // DELETE:STYLE
 export const deleteStyleSchema = {
-  body: object({}),
+  body: object({
+    password: password,
+  }),
   query: object({}),
   params: object({
     styleId: id,
