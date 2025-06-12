@@ -1,11 +1,10 @@
-import express from 'express';
+import Router from 'express';
+import { CommentController } from '../controllers/comment-controllers.js';
+import { validateRequest, updateCommentSchema, deleteCommentSchema } from '../middlewares/dto-middleware.js';
 
-const router = express.Router();
+const router = Router();
 
-import { createComment, updateComment, deleteComment } from '../controllers/comment-controllers.js';
-
-router.post('/curations/:id/comments', createComment); // 댓글 등록
-router.put('/comments/:id', updateComment); // 댓글 수정
-router.delete('/comments/:id', deleteComment); // 댓글 삭제
+router.put('/:commentId', validateRequest(updateCommentSchema), CommentController.updateComment); // 답글 수정
+router.delete('/:commentId', validateRequest(deleteCommentSchema), CommentController.deleteComment); // 답글 삭제
 
 export default router;

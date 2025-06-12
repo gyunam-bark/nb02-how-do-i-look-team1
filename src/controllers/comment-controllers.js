@@ -1,41 +1,55 @@
 import { createCommentService, updateCommentService, deleteCommentService } from '../services/comment-services.js';
 
-export const createComment = async (req, res, next) => {
-  try {
-    const comment = await createCommentService(req);
+export class CommentController {
+  // 댓글 등록
+  static async createComment(req, res, next) {
+    try {
+      const { password, content } = req.validated.body;
+      const { curationId } = req.validated.params;
 
-    return res.status(200).json({
-      id: comment.commentId,
-      nickname: comment.nickname,
-      content: comment.content,
-      createdAt: comment.createdAt,
-    });
-  } catch (err) {
-    next(err);
+      const comment = await createCommentService({ password, content, curationId });
+
+      res.status(201).json({
+        id: comment.commentId,
+        nickname: comment.nickname,
+        content: comment.content,
+        createdAt: comment.createdAt,
+      });
+    } catch (err) {
+      next(err);
+    }
   }
-};
 
-export const updateComment = async (req, res, next) => {
-  try {
-    const updated = await updateCommentService(req);
+  // 댓글 수정
+  static async updateComment(req, res, next) {
+    try {
+      const { content, password } = req.validated.body;
+      const { commentId } = req.validated.params;
 
-    return res.status(200).json({
-      id: updated.commentId,
-      nickname: updated.nickname,
-      content: updated.content,
-      createdAt: updated.createdAt,
-    });
-  } catch (err) {
-    next(err);
+      const updated = await updateCommentService({ content, password, commentId });
+
+      res.status(200).json({
+        id: updated.commentId,
+        nickname: updated.nickname,
+        content: updated.content,
+        createdAt: updated.createdAt,
+      });
+    } catch (err) {
+      next(err);
+    }
   }
-};
 
-export const deleteComment = async (req, res, next) => {
-  try {
-    const deleted = await deleteCommentService(req);
+  // 댓글 삭제
+  static async deleteComment(req, res, next) {
+    try {
+      const { password } = req.validated.body;
+      const { commentId } = req.validated.params;
 
-    return res.status(200).json(deleted);
-  } catch (err) {
-    next(err);
+      const deleted = await deleteCommentService({ password, commentId });
+
+      res.status(200).json(deleted);
+    } catch (err) {
+      next(err);
+    }
   }
-};
+}

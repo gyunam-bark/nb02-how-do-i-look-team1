@@ -1,0 +1,17 @@
+{
+  "name": "Ranking",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/ranking",
+      "body": {
+       
+      },
+      "query": {
+        "page": "number",
+        "pageSize":"number",
+        "rankBy":"string"
+      }
+    }
+  ]
+}
