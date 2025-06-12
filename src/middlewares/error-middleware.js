@@ -1,4 +1,6 @@
-import db from '../config/db.js';
+import { PrismaClient } from '@prisma/client';
+const db = new PrismaClient();
+
 
 // 상태 코드에 따른 메시지 정의 객체
 // API 명세서에 정의된 상태 코드(400, 403, 404)
