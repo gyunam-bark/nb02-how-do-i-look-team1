@@ -1,4 +1,4 @@
-import { createCommentService, updateCommentService, deleteCommentService } from '../services/comment-services.js';
+import { createCommentService, updateCommentService, deleteCommentService } from '../services/comment-service.js';
 
 export class CommentController {
   // 댓글 등록
@@ -9,7 +9,7 @@ export class CommentController {
 
       const comment = await createCommentService({ password, content, curationId });
 
-      res.status(201).json({
+      res.status(200).json({
         id: comment.commentId,
         nickname: comment.nickname,
         content: comment.content,

@@ -7,8 +7,8 @@ import styleRouter from './routes/style-routes.js';
 
 import curationRouter from './routes/curation-routes.js';
 import imageRouter from './routes/image-route.js';
-import commentRouter from './routes/comment-routes.js';
-import tagRouter from './routes/tag-router.js';
+import commentRouter from './routes/comment-route.js';
+import tagRouter from './routes/tag-routers.js';
 import rankRouter from './routes/rank-route.js';
 
 import errorHandler from './middlewares/error-middleware.js';
