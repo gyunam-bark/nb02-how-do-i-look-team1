@@ -20,7 +20,7 @@ async function createImagesAndReturnIds(images = []) {
   const imageObjs = [];
   for (let img of images || []) {
     const newImage = await prisma.image.create({
-      data: { imageUrl: img.url },
+      data: { imageUrl: url },
     });
     imageObjs.push({ imageId: newImage.imageId });
   }
@@ -314,14 +314,28 @@ export class StyleController {
     try {
       const { styleId } = req.params;
       const { password } = req.body;
+  
       const style = await prisma.style.findUnique({ where: { styleId: +styleId } });
-      if (!style) return res.status(404).json({ message: '스타일을 찾을 수 없습니다.' });
-      if (style.password !== password) return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
-
+  
+      if (!style) {
+        return res.status(404).json({ message: '스타일을 찾을 수 없습니다.' });
+      }
+  
+      if (style.password !== password) {
+        return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
+      }
+  
+      // 1. 연관 데이터 먼저 삭제 (외래키 제약 해소)
+      await prisma.category.deleteMany({ where: { styleId: +styleId } });
+      await prisma.styleTag.deleteMany({ where: { styleId: +styleId } });
+      await prisma.styleImage.deleteMany({ where: { styleId: +styleId } });
+  
+      // 2. 스타일 삭제
       await prisma.style.delete({ where: { styleId: +styleId } });
-      res.json({ message: '스타일이 삭제되었습니다.' });
+  
+      return res.status(200).json({ message: '스타일이 삭제되었습니다.' });
     } catch (err) {
-      next(err);
+      next(err); 
     }
   }
   static async createCuration(req, res, next) {

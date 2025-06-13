@@ -47,7 +47,7 @@ async function main() {
       nickname: '혜원',
       title: '여름 미니멀룩',
       content: '린넨 셔츠와 와이드 슬랙스로 미니멀하게!',
-      password: 'pw1',
+      password: 'pw12',
       categories: [
         { type: 'TOP', name: '린넨 셔츠', brand: '무신사', price: 39000n },
         { type: 'BOTTOM', name: '와이드 슬랙스', brand: '코스', price: 79000n },
@@ -60,7 +60,7 @@ async function main() {
       nickname: '승관',
       title: '빈티지 데님 스타일',
       content: '오버사이즈 청자켓과 찢어진 데님팬츠로 빈티지 무드',
-      password: 'pw2',
+      password: 'pw21',
       categories: [
         { type: 'OUTER', name: '청자켓', brand: '리바이스', price: 99000n },
         { type: 'BOTTOM', name: '데님팬츠', brand: '지오다노', price: 59000n }
@@ -72,7 +72,7 @@ async function main() {
       nickname: '우재',
       title: '포멀 오피스룩',
       content: '블레이저와 슬랙스로 깔끔한 오피스룩',
-      password: 'pw3',
+      password: 'pw31',
       categories: [
         { type: 'TOP', name: '블레이저', brand: '자라', price: 99000n },
         { type: 'BOTTOM', name: '슬랙스', brand: '유니클로', price: 59000n },
@@ -85,7 +85,7 @@ async function main() {
       nickname: '미주',
       title: '컬러풀 썸머룩',
       content: '형광 핑크탑과 옐로우 스커트로 톡톡 튀게!',
-      password: 'pw4',
+      password: 'pw41',
       categories: [
         { type: 'TOP', name: '네온 핑크탑', brand: 'H&M', price: 19000n },
         { type: 'BOTTOM', name: '옐로우 스커트', brand: '자라', price: 39000n }
@@ -97,7 +97,7 @@ async function main() {
       nickname: '보검',
       title: '스트릿 무드',
       content: '후드집업과 카고팬츠, 볼캡으로 완성!',
-      password: 'pw5',
+      password: 'pw51',
       categories: [
         { type: 'TOP', name: '후드집업', brand: '스투시', price: 129000n },
         { type: 'BOTTOM', name: '카고팬츠', brand: '칼하트', price: 99000n },
@@ -110,7 +110,7 @@ async function main() {
       nickname: '미현',
       title: '러블리 원피스룩',
       content: '플라워 패턴 원피스로 러블리하게',
-      password: 'pw6',
+      password: 'pw61',
       categories: [
         { type: 'DRESS', name: '플라워 원피스', brand: '로엠', price: 49000n },
         { type: 'SHOES', name: '메리제인 슈즈', brand: '바바라', price: 59000n }
@@ -122,7 +122,7 @@ async function main() {
       nickname: '영지',
       title: '겨울 코트 스타일',
       content: '로브코트와 니트, 부츠로 따뜻하게!',
-      password: 'pw7',
+      password: 'pw71',
       categories: [
         { type: 'OUTER', name: '로브코트', brand: '코스', price: 159000n },
         { type: 'TOP', name: '울 니트', brand: '탑텐', price: 59000n },
@@ -135,7 +135,7 @@ async function main() {
       nickname: '민규',
       title: '스포티 트레이닝룩',
       content: '트랙탑, 트레이닝팬츠, 스니커즈!',
-      password: 'pw8',
+      password: 'pw81',
       categories: [
         { type: 'TOP', name: '트랙탑', brand: '나이키', price: 89000n },
         { type: 'BOTTOM', name: '트레이닝팬츠', brand: '아디다스', price: 69000n },
@@ -148,7 +148,7 @@ async function main() {
       nickname: '혜윤',
       title: '모던 가방 포인트룩',
       content: '심플한 블라우스와 컬러백으로 포인트',
-      password: 'pw9',
+      password: 'pw91',
       categories: [
         { type: 'TOP', name: '블라우스', brand: '자라', price: 49000n },
         { type: 'BAG', name: '컬러백', brand: '코치', price: 159000n }

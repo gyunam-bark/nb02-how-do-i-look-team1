@@ -67,7 +67,7 @@ model Category {
   brand      String
   price      BigInt
 
-  style Style @relation(fields: [styleId], references: [styleId])
+  style Style @relation(fields: [styleId], references: [styleId], onDelete: Cascade)
 }
 
 enum CategoryType {

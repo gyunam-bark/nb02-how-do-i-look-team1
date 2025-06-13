@@ -98,6 +98,7 @@ const saveLogToDatabse = async (req = {}, statusCode = '', message = '') => {
   const method = req.method;
   const ip = req.ip || req.headers['x-forwarded-for'];
 
+
   await db.log.create({
     data: { ip, url, method, statusCode: String(statusCode), message },
   });
