@@ -77,9 +77,14 @@ export default class LogService {
       }),
     ]);
 
+    const fixedLogList = logList.map(({ logId, ...other }) => ({
+      id: logId,
+      ...other,
+    }));
+
     return {
       totalItemCount: totalItemCount,
-      data: logList,
+      data: fixedLogList,
     };
   };
 }
