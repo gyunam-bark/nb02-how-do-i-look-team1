@@ -1,64 +1,60 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import db from '../config/db.js';
 
-// 태그 name 배열을 받아 findOrCreate 후 [{ tagId }] 배열 반환
+// 유틸 함수
 async function getOrCreateTagIds(tagNames = []) {
   const tagObjs = [];
   for (let name of tagNames) {
     const cleanName = name.trim();
-    let tag = await prisma.tag.findUnique({ where: { name: cleanName } });
+    let tag = await db.tag.findUnique({ where: { name: cleanName } });
     if (!tag) {
-      tag = await prisma.tag.create({ data: { name: cleanName } });
+      tag = await db.tag.create({ data: { name: cleanName } });
     }
     tagObjs.push({ tagId: tag.tagId });
   }
   return tagObjs;
 }
-
-// 이미지 url 배열을 받아 Image 테이블에 저장 후 [{ imageId }] 배열 반환
-async function createImagesAndReturnIds(images = []) {
+// 이미지 URL 배열을 받아서 이미지 객체 배열로 변환
+async function createImagesAndReturnIds(imageUrls = []) {
   const imageObjs = [];
-  for (let img of images || []) {
-    const newImage = await prisma.image.create({
-      data: { imageUrl: url },
+  for (let img of imageUrls || []) {
+    const newImage = await db.image.create({ data: { imageUrl: img } });
+    imageObjs.push({
+      imageId: newImage.imageId,
+      imageUrl: newImage.imageUrl, // 함께 반환
     });
-    imageObjs.push({ imageId: newImage.imageId });
   }
   return imageObjs;
 }
-
-// BigInt JSON 직렬화 변환
+// JSON.stringify 시 BigInt를 문자열로 변환하는 리플레이서 함수
 function jsonBigIntReplacer(key, value) {
   return typeof value === 'bigint' ? value.toString() : value;
 }
-
-// categories 배열 → 객체 변환 (응답용)
+// 카테고리 배열을 객체로 변환
 function categoriesArrayToObject(categoriesArr) {
   const obj = {};
   for (const cat of categoriesArr) {
     obj[cat.type.toLowerCase()] = {
       name: cat.name,
       brand: cat.brand,
-      price: cat.price.toString(),
+      price: Number(cat.price),
     };
   }
   return obj;
 }
 
 export class StyleController {
-  // 스타일 등록
+  // 스타일 생성
   static async createStyle(req, res, next) {
     try {
-      const { nickname, title, content, password, categories, tags = [], images = [] } = req.body;
+      const { nickname, title, content, password, categories, tags = [], imageUrls = [] } = req.body;
 
-      // categories: 객체 또는 배열 → 배열로 변환 (Prisma 저장용)
       let categoriesArr = [];
-      if (categories && Array.isArray(categories)) {
+      if (Array.isArray(categories)) {
         categoriesArr = categories.map((cat) => ({
           ...cat,
           price: BigInt(cat.price),
         }));
-      } else if (categories && typeof categories === 'object' && !Array.isArray(categories)) {
+      } else if (typeof categories === 'object') {
         categoriesArr = Object.entries(categories).map(([key, value]) => ({
           type: key.toUpperCase(),
           ...value,
@@ -66,20 +62,16 @@ export class StyleController {
         }));
       }
 
-      // 태그 findOrCreate → [{ tagId }]
       const tagObjs = await getOrCreateTagIds(tags);
-      // 이미지 등록 → [{ imageId }]
-      const imageObjs = await createImagesAndReturnIds(images);
+      const imageObjs = await createImagesAndReturnIds(imageUrls);
 
-      const newStyle = await prisma.style.create({
+      const newStyle = await db.style.create({
         data: {
           nickname,
           title,
           content,
           password,
-          categories: {
-            create: categoriesArr,
-          },
+          categories: { create: categoriesArr },
           styleTags: {
             create: tagObjs.map((obj) => ({
               tag: { connect: { tagId: obj.tagId } },
@@ -97,30 +89,30 @@ export class StyleController {
           styleImages: { include: { image: true } },
         },
       });
-
-      // 응답에서 categories를 객체로 변환
+      //API 명세서에 따라 응답 형식 변경
       const response = {
-        ...newStyle,
+        id: newStyle.styleId,
+        nickname: newStyle.nickname,
+        title: newStyle.title,
+        content: newStyle.content,
+        viewCount: newStyle.viewCount,
+        curationCount: newStyle.curationCount,
+        createdAt: newStyle.createdAt,
         categories: categoriesArrayToObject(newStyle.categories),
-        // tags 항상 배열로 반환
-        tags: Array.isArray(newStyle.styleTags)
-          ? newStyle.styleTags.map(st => st.tag?.name ?? '')
-          : [],
-        imageUrls: Array.isArray(newStyle.styleImages)
-          ? newStyle.styleImages.map(si => si.image?.imageUrl ?? '')
-          : [],
+        tags: newStyle.styleTags.map((st) => st.tag?.name ?? '').filter(Boolean),
+        imageUrls: newStyle.styleImages.map((si) => si.image?.imageUrl ?? '').filter(Boolean),
       };
-      res.status(201).set('Content-Type', 'application/json').send(JSON.stringify(response, jsonBigIntReplacer));
+
+      res.status(201).json(response);
     } catch (err) {
       next(err);
     }
   }
-
   // 스타일 목록 조회
   static async getStyleList(req, res, next) {
     try {
       const { page = 1, pageSize = 10, sort = 'latest', search } = req.query;
-  
+
       const where = search
         ? {
             OR: [
@@ -130,15 +122,15 @@ export class StyleController {
             ],
           }
         : {};
-  
+
       let orderBy;
       if (sort === 'views') orderBy = { viewCount: 'desc' };
       else if (sort === 'curation') orderBy = { curationCount: 'desc' };
       else orderBy = { createdAt: 'desc' };
-  
+
       const [totalItemCount, styles] = await Promise.all([
-        prisma.style.count({ where }),
-        prisma.style.findMany({
+        db.style.count({ where }),
+        db.style.findMany({
           where,
           skip: (page - 1) * pageSize,
           take: +pageSize,
@@ -151,10 +143,10 @@ export class StyleController {
           },
         }),
       ]);
-  
+
       const totalPages = Math.ceil(totalItemCount / pageSize);
       const currentPage = Number(page);
-  
+
       const data = styles.map((style) => ({
         id: style.styleId,
         thumbnail: style.styleImages?.[0]?.image?.imageUrl ?? null,
@@ -167,7 +159,7 @@ export class StyleController {
         curationCount: style.curationCount,
         createdAt: style.createdAt,
       }));
-  
+
       res
         .set('Content-Type', 'application/json')
         .send(JSON.stringify(
@@ -179,35 +171,21 @@ export class StyleController {
           },
           jsonBigIntReplacer
         ));
-
-        function categoriesArrayToObject(categoriesArr) {
-          const obj = {};
-          for (const cat of categoriesArr) {
-            obj[cat.type.toLowerCase()] = {
-              name: cat.name,
-              brand: cat.brand,
-              price: Number(cat.price),
-            };
-          }
-          return obj;
-        }
     } catch (err) {
       next(err);
     }
   }
-  
-  // 스타일 상세 조회 (+조회수 증가)
+
   static async getStyleDetail(req, res, next) {
     try {
       const { styleId } = req.params;
 
-      // 조회수 증가
-      await prisma.style.update({
+      await db.style.update({
         where: { styleId: +styleId },
         data: { viewCount: { increment: 1 } },
       });
 
-      const style = await prisma.style.findUnique({
+      const style = await db.style.findUnique({
         where: { styleId: +styleId },
         include: {
           categories: true,
@@ -218,7 +196,7 @@ export class StyleController {
       });
 
       if (!style) return res.status(404).json({ message: '스타일을 찾을 수 없습니다.' });
-      
+
       const response = {
         id: style.styleId,
         nickname: style.nickname,
@@ -228,31 +206,25 @@ export class StyleController {
         curationCount: style.curationCount,
         createdAt: style.createdAt,
         categories: categoriesArrayToObject(style.categories),
-        // tags 항상 배열로 반환
-        tags: Array.isArray(style.styleTags)
-          ? style.styleTags.map(st => st.tag?.name ?? '').filter(Boolean)
-          : [],
-        imageUrls: Array.isArray(style.styleImages)
-          ? style.styleImages.map(si => si.image?.imageUrl ?? '').filter(Boolean)
-          : [],
+        tags: style.styleTags.map(st => st.tag?.name ?? '').filter(Boolean),
+        imageUrls: style.styleImages.map(si => si.image?.imageUrl ?? '').filter(Boolean),
       };
+
       res.set('Content-Type', 'application/json').send(JSON.stringify(response, jsonBigIntReplacer));
     } catch (err) {
       next(err);
     }
   }
-
   // 스타일 수정
   static async updateStyle(req, res, next) {
     try {
       const { styleId } = req.params;
-      const { password, title, content, categories, tags = [], images = [] } = req.body;
-
-      const style = await prisma.style.findUnique({ where: { styleId: +styleId } });
+      const { nickname, password, title, content, categories, tags = [], images = [] } = req.body;
+  
+      const style = await db.style.findUnique({ where: { styleId: +styleId } });
       if (!style) return res.status(404).json({ message: '스타일을 찾을 수 없습니다.' });
       if (style.password !== password) return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
-
-      // categories: 객체 또는 배열 → 배열로 변환 (Prisma 저장용)
+  
       let categoriesArr = [];
       if (categories && Array.isArray(categories)) {
         categoriesArr = categories.map((cat) => ({
@@ -266,26 +238,30 @@ export class StyleController {
           price: BigInt(value.price),
         }));
       }
-
-      // 태그 findOrCreate
+  
       const tagObjs = await getOrCreateTagIds(tags);
-      // 이미지 등록
       const imageObjs = await createImagesAndReturnIds(images);
-
-      // 기존 연결 데이터(카테고리, 태그, 이미지) 삭제 후 재생성 방식
-      const updatedStyle = await prisma.style.update({
+  
+      const updatedStyle = await db.style.update({
         where: { styleId: +styleId },
         data: {
+          nickname, 
           title,
           content,
-          categories: { deleteMany: {}, create: categoriesArr },
-          styleTags: { deleteMany: {}, create: tagObjs.map((obj) => ({ tag: { connect: { tagId: obj.tagId } } })) },
+          categories: {
+            deleteMany: {},
+            create: categoriesArr,
+          },
+          styleTags: {
+            deleteMany: {},
+            create: tagObjs.map((obj) => ({
+              tag: { connect: { tagId: obj.tagId } },
+            })),
+          },
           styleImages: {
             deleteMany: {},
             create: imageObjs.map((obj) => ({
-              image: {
-                connect: { imageId: obj.imageId },
-              },
+              image: { connect: { imageId: obj.imageId } },
             })),
           },
           updatedAt: new Date(),
@@ -296,8 +272,7 @@ export class StyleController {
           styleImages: { include: { image: true } },
         },
       });
-
-      // 응답에서 categories를 객체로 변환
+  
       const response = {
         id: updatedStyle.styleId,
         nickname: updatedStyle.nickname,
@@ -307,55 +282,48 @@ export class StyleController {
         curationCount: updatedStyle.curationCount,
         createdAt: updatedStyle.createdAt,
         categories: categoriesArrayToObject(updatedStyle.categories),
-        tags: Array.isArray(updatedStyle.styleTags)
-          ? updatedStyle.styleTags.map(st => st.tag?.name ?? '').filter(Boolean)
-          : [],
-        imageUrls: Array.isArray(updatedStyle.styleImages)
-          ? updatedStyle.styleImages.map(si => si.image?.imageUrl ?? '').filter(Boolean)
-          : [],
+        tags: updatedStyle.styleTags.map((st) => st.tag?.name ?? '').filter(Boolean),
+        imageUrls: updatedStyle.styleImages.map((si) => si.image?.imageUrl ?? '').filter(Boolean),
       };
+  
       res.set('Content-Type', 'application/json').send(JSON.stringify(response, jsonBigIntReplacer));
     } catch (err) {
       next(err);
     }
   }
-
   // 스타일 삭제
   static async deleteStyle(req, res, next) {
     try {
       const { styleId } = req.params;
       const { password } = req.body;
-  
-      const style = await prisma.style.findUnique({ where: { styleId: +styleId } });
-  
+
+      const style = await db.style.findUnique({ where: { styleId: +styleId } });
+
       if (!style) {
         return res.status(404).json({ message: '스타일을 찾을 수 없습니다.' });
       }
-  
+
       if (style.password !== password) {
         return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
       }
-  
-      // 1. 연관 데이터 먼저 삭제 (외래키 제약 해소)
-      await prisma.category.deleteMany({ where: { styleId: +styleId } });
-      await prisma.styleTag.deleteMany({ where: { styleId: +styleId } });
-      await prisma.styleImage.deleteMany({ where: { styleId: +styleId } });
-  
-      // 2. 스타일 삭제
-      await prisma.style.delete({ where: { styleId: +styleId } });
-  
+
+      await db.category.deleteMany({ where: { styleId: +styleId } });
+      await db.styleTag.deleteMany({ where: { styleId: +styleId } });
+      await db.styleImage.deleteMany({ where: { styleId: +styleId } });
+
+      await db.style.delete({ where: { styleId: +styleId } });
+
       return res.status(200).json({ message: '스타일이 삭제되었습니다.' });
     } catch (err) {
-      next(err); 
+      next(err);
     }
   }
+
   static async createCuration(req, res, next) {
-    // TODO: 구현
     res.status(501).json({ message: 'Not implemented' });
   }
-  
+
   static async getCurationList(req, res, next) {
-    // TODO: 구현
     res.status(501).json({ message: 'Not implemented' });
   }
 }

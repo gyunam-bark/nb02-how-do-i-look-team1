@@ -159,6 +159,7 @@ export const getStyleListSchema = {
 // PUT:STYLE
 export const updateStyleSchema = {
   body: object({
+    nickname: optional(nickname),
     password: password,
     title: optional(title),
     content: optional(content),
