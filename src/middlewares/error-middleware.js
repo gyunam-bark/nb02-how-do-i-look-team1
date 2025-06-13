@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 const db = new PrismaClient();
 
-
 // 상태 코드에 따른 메시지 정의 객체
 // API 명세서에 정의된 상태 코드(400, 403, 404)
 // 나머지는 MDN 을 바탕으로 정의합니다.
@@ -95,27 +94,13 @@ const responseErrorService = (res = {}, statusCode = 500, message = '') => {
 };
 
 const saveLogToDatabse = async (req = {}, statusCode = '', message = '') => {
-  const endpoint = req.originalUrl || req.url || 'unknown';
+  const url = req.originalUrl || req.url || 'unknown';
   const method = req.method;
-  const params = req.validated ?? {};
   const ip = req.ip || req.headers['x-forwarded-for'];
-  const detail = {
-    endpoint,
-    method,
-    params,
-    statusCode: String(statusCode),
-    message,
-  };
 
-  await db.log.create({ 
-    data: { ip, detail: {
-                  endpoint,
-                  method,
-                  params,
-                  statusCode: String(statusCode),
-                  message,}, 
-          }, 
-        });
+  await db.log.create({
+    data: { ip, url, method, statusCode: String(statusCode), message },
+  });
 };
 
 // 글로벌 에러 핸들러

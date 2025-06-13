@@ -29,7 +29,7 @@ const SEARCH_BY_LOG_ENUMS = {
   IP: 'ip',
   MESSAGE: 'message',
   METHOD: 'method',
-  ENDPOINT: 'endpoint',
+  URL: 'url',
   STATUS_CODE: 'statusCode',
   CREATED_AT: 'createdAt',
 };

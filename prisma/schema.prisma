@@ -116,8 +116,11 @@ model StyleTag {
 }
 
 model Log {
-  logId     Int      @id @default(autoincrement())
-  ip        String
-  detail    Json // { endpoint, method, params, statusCode, message }
-  createdAt DateTime @default(now())
+  logId      Int      @id @default(autoincrement())
+  ip         String
+  url        String
+  method     String
+  statusCode String
+  message    String
+  createdAt  DateTime @default(now())
 }
