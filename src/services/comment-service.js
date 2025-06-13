@@ -1,4 +1,5 @@
 import db from '../config/db.js';
+import bcrypt from 'bcrypt';
 
 // 답글 등록
 export const createCommentService = async ({ password, content, curationId }) => {
@@ -14,7 +15,7 @@ export const createCommentService = async ({ password, content, curationId }) =>
     throw error;
   }
 
-  if (curation.style.password !== password) {
+  if (!(await bcrypt.compare(password, curation.style.password))) {
     const error = new Error('비밀번호가 틀렸습니다');
     error.statusCode = 401;
     throw error;
@@ -30,10 +31,12 @@ export const createCommentService = async ({ password, content, curationId }) =>
     throw error;
   }
 
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   const comment = await db.comment.create({
     data: {
       content,
-      password,
+      password: hashedPassword,
       curation: { connect: { curationId } },
     },
   });
@@ -62,7 +65,7 @@ export const updateCommentService = async ({ content, password, commentId }) => 
     throw error;
   }
 
-  if (comment.password !== password) {
+  if (!(await bcrypt.compare(password, comment.password))) {
     const error = new Error('비밀번호가 틀렸습니다');
     error.statusCode = 401;
     throw error;
@@ -91,7 +94,7 @@ export const deleteCommentService = async ({ password, commentId }) => {
     throw error;
   }
 
-  if (comment.password !== password) {
+  if (!(await bcrypt.compare(password, comment.password))) {
     const error = new Error('비밀번호가 틀렸습니다');
     error.statusCode = 401;
     throw error;
