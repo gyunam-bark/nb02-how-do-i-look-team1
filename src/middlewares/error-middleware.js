@@ -107,7 +107,15 @@ const saveLogToDatabse = async (req = {}, statusCode = '', message = '') => {
     message,
   };
 
-  await db.log.create({ data: { ip, detail } });
+  await db.log.create({ 
+    data: { ip, detail: {
+                  endpoint,
+                  method,
+                  params,
+                  statusCode: String(statusCode),
+                  message,}, 
+          }, 
+        });
 };
 
 // 글로벌 에러 핸들러
