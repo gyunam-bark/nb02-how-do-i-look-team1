@@ -6,6 +6,8 @@
     "node": ">=22.15.0"
   },
   "main": "index.js",
+  "prisma": {
+  "seed": "node prisma/seed.js"},
   "scripts": {
     "reset": "npx prisma migrate reset -f",
     "migrate": "npx prisma migrate dev",
@@ -28,6 +30,7 @@
   "homepage": "https://github.com/gyunam-bark/nb02-how-do-i-look-team1#readme",
   "dependencies": {
     "@prisma/client": "^6.8.2",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
