@@ -26,6 +26,7 @@ const SEARCH_BY_CURATION_ENUMS = {
   CONTENT: 'content',
 };
 const SEARCH_BY_LOG_ENUMS = {
+  IP: 'ip',
   MESSAGE: 'message',
   METHOD: 'method',
   ENDPOINT: 'endpoint',
@@ -163,7 +164,7 @@ export const updateStyleSchema = {
     content: optional(content),
     categories: optional(categories),
     tags: optional(tags),
-    imageUrls: optional(imageUrls), 
+    imageUrls: optional(imageUrls),
   }),
   query: object({}),
   params: object({
@@ -342,4 +343,6 @@ export default {
   createCommentSchema,
   updateCommentSchema,
   deleteCommentSchema,
+  // LOG
+  getLogListSchema,
 };
