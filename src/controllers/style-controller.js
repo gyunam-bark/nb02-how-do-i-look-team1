@@ -13,23 +13,23 @@ async function getOrCreateTagIds(tagNames = []) {
   }
   return tagObjs;
 }
-// 이미지 URL 배열을 받아서 이미지 객체 배열로 변환
+// 이미지 생성 및 ID 반환 함수
 async function createImagesAndReturnIds(imageUrls = []) {
   const imageObjs = [];
   for (let img of imageUrls || []) {
     const newImage = await db.image.create({ data: { imageUrl: img } });
     imageObjs.push({
       imageId: newImage.imageId,
-      imageUrl: newImage.imageUrl, // 함께 반환
+      imageUrl: newImage.imageUrl, 
     });
   }
   return imageObjs;
 }
-// JSON.stringify 시 BigInt를 문자열로 변환하는 리플레이서 함수
+// JSON 직렬화 시 BigInt를 문자열로 변환하는 함수
 function jsonBigIntReplacer(key, value) {
   return typeof value === 'bigint' ? value.toString() : value;
 }
-// 카테고리 배열을 객체로 변환
+// 카테고리 배열을 객체로 변환하는 함수
 function categoriesArrayToObject(categoriesArr) {
   const obj = {};
   for (const cat of categoriesArr) {
@@ -41,9 +41,8 @@ function categoriesArrayToObject(categoriesArr) {
   }
   return obj;
 }
-
+// 스타일 생성
 export class StyleController {
-  // 스타일 생성
   static async createStyle(req, res, next) {
     try {
       const { nickname, title, content, password, categories, tags = [], imageUrls = [] } = req.body;
@@ -89,7 +88,16 @@ export class StyleController {
           styleImages: { include: { image: true } },
         },
       });
-      //API 명세서에 따라 응답 형식 변경
+
+      // 응답 시 tags 순서 보장
+      const sortedTags = tags.filter((name) =>
+        newStyle.styleTags.some((st) => st.tag?.name === name)
+      );
+      // 응답 시 imageUrls 순서 보장
+    const sortedImageUrls = imageUrls.filter((url) =>
+      newStyle.styleImages.some((si) => si.image?.imageUrl === url)
+    );
+      // API 명세서에 맞게 응답 형식 변경
       const response = {
         id: newStyle.styleId,
         nickname: newStyle.nickname,
@@ -99,8 +107,8 @@ export class StyleController {
         curationCount: newStyle.curationCount,
         createdAt: newStyle.createdAt,
         categories: categoriesArrayToObject(newStyle.categories),
-        tags: newStyle.styleTags.map((st) => st.tag?.name ?? '').filter(Boolean),
-        imageUrls: newStyle.styleImages.map((si) => si.image?.imageUrl ?? '').filter(Boolean),
+        tags: sortedTags,
+        imageUrls: sortedImageUrls, 
       };
 
       res.status(201).json(response);
@@ -146,7 +154,7 @@ export class StyleController {
 
       const totalPages = Math.ceil(totalItemCount / pageSize);
       const currentPage = Number(page);
-
+      
       const data = styles.map((style) => ({
         id: style.styleId,
         thumbnail: style.styleImages?.[0]?.image?.imageUrl ?? null,
@@ -175,7 +183,7 @@ export class StyleController {
       next(err);
     }
   }
-
+  // 스타일 상세 조회
   static async getStyleDetail(req, res, next) {
     try {
       const { styleId } = req.params;
@@ -196,7 +204,7 @@ export class StyleController {
       });
 
       if (!style) return res.status(404).json({ message: '스타일을 찾을 수 없습니다.' });
-
+      // API 명세서에 맞게 응답 형식 변경
       const response = {
         id: style.styleId,
         nickname: style.nickname,
@@ -215,82 +223,102 @@ export class StyleController {
       next(err);
     }
   }
-  // 스타일 수정
-  static async updateStyle(req, res, next) {
-    try {
-      const { styleId } = req.params;
-      const { nickname, password, title, content, categories, tags = [], images = [] } = req.body;
   
-      const style = await db.style.findUnique({ where: { styleId: +styleId } });
-      if (!style) return res.status(404).json({ message: '스타일을 찾을 수 없습니다.' });
-      if (style.password !== password) return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
-  
-      let categoriesArr = [];
-      if (categories && Array.isArray(categories)) {
-        categoriesArr = categories.map((cat) => ({
-          ...cat,
-          price: BigInt(cat.price),
-        }));
-      } else if (categories && typeof categories === 'object' && !Array.isArray(categories)) {
-        categoriesArr = Object.entries(categories).map(([key, value]) => ({
-          type: key.toUpperCase(),
-          ...value,
-          price: BigInt(value.price),
-        }));
-      }
-  
-      const tagObjs = await getOrCreateTagIds(tags);
-      const imageObjs = await createImagesAndReturnIds(images);
-  
-      const updatedStyle = await db.style.update({
-        where: { styleId: +styleId },
-        data: {
-          nickname, 
-          title,
-          content,
-          categories: {
-            deleteMany: {},
-            create: categoriesArr,
-          },
-          styleTags: {
-            deleteMany: {},
-            create: tagObjs.map((obj) => ({
-              tag: { connect: { tagId: obj.tagId } },
-            })),
-          },
-          styleImages: {
-            deleteMany: {},
-            create: imageObjs.map((obj) => ({
-              image: { connect: { imageId: obj.imageId } },
-            })),
-          },
-          updatedAt: new Date(),
-        },
-        include: {
-          categories: true,
-          styleTags: { include: { tag: true } },
-          styleImages: { include: { image: true } },
-        },
-      });
-  
-      const response = {
-        id: updatedStyle.styleId,
-        nickname: updatedStyle.nickname,
-        title: updatedStyle.title,
-        content: updatedStyle.content,
-        viewCount: updatedStyle.viewCount,
-        curationCount: updatedStyle.curationCount,
-        createdAt: updatedStyle.createdAt,
-        categories: categoriesArrayToObject(updatedStyle.categories),
-        tags: updatedStyle.styleTags.map((st) => st.tag?.name ?? '').filter(Boolean),
-        imageUrls: updatedStyle.styleImages.map((si) => si.image?.imageUrl ?? '').filter(Boolean),
-      };
-  
-      res.set('Content-Type', 'application/json').send(JSON.stringify(response, jsonBigIntReplacer));
-    } catch (err) {
-      next(err);
+ // 스타일 수정
+ static async updateStyle(req, res, next) {
+  try {
+    const { styleId } = req.params;
+    const {
+      nickname,
+      password,
+      title,
+      content,
+      categories,
+      tags = [],
+      imageUrls = [],
+    } = req.body;
+
+    const style = await db.style.findUnique({ where: { styleId: +styleId } });
+    if (!style) {
+      return res.status(404).json({ message: '스타일을 찾을 수 없습니다.' });
     }
+    if (style.password !== password) {
+      return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
+    }
+
+    // categories 변환
+    let categoriesArr = [];
+    if (Array.isArray(categories)) {
+      categoriesArr = categories.map((cat) => ({
+        ...cat,
+        price: BigInt(cat.price),
+      }));
+    } else if (typeof categories === 'object') {
+      categoriesArr = Object.entries(categories).map(([key, value]) => ({
+        type: key.toUpperCase(),
+        ...value,
+        price: BigInt(value.price),
+      }));
+    }
+
+    // tag, image 등록
+    const tagObjs = await getOrCreateTagIds(tags);
+    const imageObjs = await createImagesAndReturnIds(imageUrls);
+
+    // 스타일 업데이트
+    const updatedStyle = await db.style.update({
+      where: { styleId: +styleId },
+      data: {
+        nickname,
+        title,
+        content,
+        categories: {
+          deleteMany: {},
+          create: categoriesArr,
+        },
+        styleTags: {
+          deleteMany: {},
+          create: tagObjs.map((obj) => ({
+            tag: { connect: { tagId: obj.tagId } },
+          })),
+        },
+        styleImages: {
+          deleteMany: {},
+          create: imageObjs.map((obj) => ({
+            image: { connect: { imageId: obj.imageId } },
+          })),
+        },
+        updatedAt: new Date(),
+      },
+      include: {
+        categories: true,
+        styleTags: { include: { tag: true } },
+        styleImages: { include: { image: true } },
+      },
+    });
+
+    // 응답 생성 (명세서 기준)
+    const response = {
+      id: updatedStyle.styleId,
+      nickname: updatedStyle.nickname,
+      title: updatedStyle.title,
+      content: updatedStyle.content,
+      viewCount: updatedStyle.viewCount,
+      curationCount: updatedStyle.curationCount,
+      createdAt: updatedStyle.createdAt,
+      categories: categoriesArrayToObject(updatedStyle.categories),
+      tags: updatedStyle.styleTags.map((st) => st.tag?.name ?? '').filter(Boolean),
+      imageUrls: updatedStyle.styleImages.map((si) => si.image?.imageUrl ?? '').filter(Boolean),
+    };
+
+    res
+      .set('Content-Type', 'application/json')
+      .send(JSON.stringify(response, jsonBigIntReplacer));
+  } catch (err) {
+    next(err);
   }
+}
+
   // 스타일 삭제
   static async deleteStyle(req, res, next) {
     try {
@@ -306,7 +334,7 @@ export class StyleController {
       if (style.password !== password) {
         return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
       }
-
+      // 관련된 카테고리, 태그, 이미지 삭제
       await db.category.deleteMany({ where: { styleId: +styleId } });
       await db.styleTag.deleteMany({ where: { styleId: +styleId } });
       await db.styleImage.deleteMany({ where: { styleId: +styleId } });
@@ -318,11 +346,11 @@ export class StyleController {
       next(err);
     }
   }
-
+  // 큐레이션 생성
   static async createCuration(req, res, next) {
     res.status(501).json({ message: 'Not implemented' });
   }
-
+  // 큐레이션 목록 조회
   static async getCurationList(req, res, next) {
     res.status(501).json({ message: 'Not implemented' });
   }
