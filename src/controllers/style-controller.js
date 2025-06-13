@@ -120,7 +120,7 @@ export class StyleController {
   static async getStyleList(req, res, next) {
     try {
       const { page = 1, pageSize = 10, sort = 'latest', search } = req.query;
-
+  
       const where = search
         ? {
             OR: [
@@ -130,13 +130,13 @@ export class StyleController {
             ],
           }
         : {};
-
+  
       let orderBy;
       if (sort === 'views') orderBy = { viewCount: 'desc' };
       else if (sort === 'curation') orderBy = { curationCount: 'desc' };
       else orderBy = { createdAt: 'desc' };
-
-      const [total, styles] = await Promise.all([
+  
+      const [totalItemCount, styles] = await Promise.all([
         prisma.style.count({ where }),
         prisma.style.findMany({
           where,
@@ -151,40 +151,51 @@ export class StyleController {
           },
         }),
       ]);
-
-      // // 각 style의 categories를 객체로 변환##########
-      // const stylesObj = styles.map((style) => ({
-      //   ...style,
-      //   categories: categoriesArrayToObject(style.categories),
-      // }));
-      
-      const stylesObj = styles.map((style) => ({
+  
+      const totalPages = Math.ceil(totalItemCount / pageSize);
+      const currentPage = Number(page);
+  
+      const data = styles.map((style) => ({
         id: style.styleId,
+        thumbnail: style.styleImages?.[0]?.image?.imageUrl ?? null,
         nickname: style.nickname,
         title: style.title,
+        tags: style.styleTags?.map(st => st.tag?.name).filter(Boolean) || [],
+        categories: categoriesArrayToObject(style.categories),
         content: style.content,
         viewCount: style.viewCount,
         curationCount: style.curationCount,
         createdAt: style.createdAt,
-        // 각 style의 categories를 객체로 변환
-        categories: categoriesArrayToObject(style.categories), 
-        // tags 항상 배열로 반환
-        tags: Array.isArray(style.styleTags)
-          ? style.styleTags.map(st => st.tag?.name ?? '').filter(Boolean)
-          : [],
-        imageUrls: Array.isArray(style.styleImages)
-          ? style.styleImages.map(si => si.image?.imageUrl ?? '').filter(Boolean)
-          : [],
       }));
-      
+  
       res
         .set('Content-Type', 'application/json')
-        .send(JSON.stringify({ total, styles: stylesObj }, jsonBigIntReplacer));
+        .send(JSON.stringify(
+          {
+            currentPage,
+            totalPages,
+            totalItemCount,
+            data,
+          },
+          jsonBigIntReplacer
+        ));
+
+        function categoriesArrayToObject(categoriesArr) {
+          const obj = {};
+          for (const cat of categoriesArr) {
+            obj[cat.type.toLowerCase()] = {
+              name: cat.name,
+              brand: cat.brand,
+              price: Number(cat.price),
+            };
+          }
+          return obj;
+        }
     } catch (err) {
       next(err);
     }
   }
-
+  
   // 스타일 상세 조회 (+조회수 증가)
   static async getStyleDetail(req, res, next) {
     try {
