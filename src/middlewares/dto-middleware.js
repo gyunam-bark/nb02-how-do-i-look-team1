@@ -159,13 +159,13 @@ export const getStyleListSchema = {
 // PUT:STYLE
 export const updateStyleSchema = {
   body: object({
-    nickname: optional(nickname),
+    nickname: nickname,
     password: password,
-    title: optional(title),
-    content: optional(content),
-    categories: optional(categories),
-    tags: optional(tags),
-    imageUrls: optional(imageUrls),
+    title: title,
+    content: content,
+    categories: categories,
+    tags: tags,
+    imageUrls: imageUrls,
   }),
   query: object({}),
   params: object({
