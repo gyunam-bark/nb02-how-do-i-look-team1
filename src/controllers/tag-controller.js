@@ -5,7 +5,7 @@ export default class TagController {
     try {
       const tagList = await TagService.getTagList();
 
-      res.status(200).json(tagList);
+      res.status(200).json({ tags: tagList });
     } catch (error) {
       next(error);
     }
