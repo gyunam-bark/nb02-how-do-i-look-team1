@@ -1,4 +1,17 @@
-import { object, optional, string, size, coerce, number, enums, min, array, create, StructError } from 'superstruct';
+import {
+  object,
+  optional,
+  string,
+  size,
+  coerce,
+  number,
+  enums,
+  min,
+  array,
+  create,
+  define,
+  StructError,
+} from 'superstruct';
 
 // ----------------------------------------------------------
 // CONSTANTS
@@ -84,7 +97,19 @@ const integer = coerce(number(), string(), stringToInteger);
 // ----------------------------------------------------------
 // 파라미터 정의
 // ----------------------------------------------------------
-const id = min(integer, ID_MIN);
+// const id = min(integer, ID_MIN);
+
+// string을 number로 바꾸고, 정수+최소값 체크까지 한 번에 가능함
+const id = coerce(
+  min(number(), ID_MIN), // number, 최소값
+  string(), // string이면
+  (value) => {
+    const num = Number(value);
+    if (!Number.isInteger(num)) throw new Error('not an integer');
+    return num;
+  }
+);
+
 const page = min(integer, PAGE_MIN);
 const pageSize = min(integer, PAGE_SIZE_MIN);
 const sortByStyle = enums(Object.values(SORT_BY_STYLE_ENUMS));
@@ -303,7 +328,9 @@ export const getLogListSchema = {
 // ----------------------------------------------------------
 // CURRYING | MIDDLEWARE FACTORY 패턴
 export const validateRequest = (schema = {}) => {
-  return async (req = {}, _res = {}, next) => {
+  return async (req = {}, res = {}, next) => {
+    // console.log('🟡 [validateRequest] req.params:', req.params);
+
     try {
       req.validated = {
         body: schema.body ? create(req.body ?? {}, schema.body) : undefined,
@@ -311,9 +338,17 @@ export const validateRequest = (schema = {}) => {
         params: schema.params ? create(req.params ?? {}, schema.params) : undefined,
       };
 
+      // return res.json({
+      //   params: req.params,
+      //   path: req.path,
+      //   originalUrl: req.originalUrl,
+      //   url: req.url,
+      // });
+
       // NEXT TO CONTROLLER
       next();
     } catch (error) {
+      console.log('🟥 validateRequest error:', error); 
       if (error instanceof StructError) {
         error.statusCode = 400;
         error.message = undefined;
