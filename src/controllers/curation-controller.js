@@ -1,13 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-import {
-  updateCurationService,
-  deleteCurationService,
-} from '../services/curation-service.js';
+import { updateCurationService, deleteCurationService } from '../services/curation-service.js';
 
 export class CurationController {
-
   // 큐레이팅 수정 (PUT /curations/:curationId)
   static async updateCuration(req, res, next) {
     try {
@@ -24,7 +20,19 @@ export class CurationController {
         nickname,
       });
 
-      res.status(200).json(updatedCurationData);
+      const response = {
+        id: updatedCurationData.curationId,
+        nickname: updatedCurationData.nickname,
+        content: updatedCurationData.content,
+        trendy: updatedCurationData.trendy,
+        personality: updatedCurationData.personality,
+        practicality: updatedCurationData.practicality,
+        costEffectiveness: updatedCurationData.costEffectiveness,
+        createdAt: updatedCurationData.createdAt,
+      };
+
+      res.status(200).json(response);
+      // console.log(`🚨response:`, response);
     } catch (err) {
       if (err.message === '큐레이팅을 찾을 수 없습니다.') {
         return res.status(404).json({ message: err.message });
