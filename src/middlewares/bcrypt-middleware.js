@@ -1,13 +1,13 @@
-import bcrypt from 'bcrypt';
+import { hashPassword } from '../utils/hash-password.js';
 
-const saltRounds = 10;
-export const hashPassword = async (req, _res, next) => {
+export const hashPasswordMiddleware = async (req, _res, next) => {
   try {
-    const body = req.validated?.body || req.body;
-
-    if (body?.password) {
-      body.password = await bcrypt.hash(body.password, saltRounds);
+    const body = req.validated?.body;
+    
+    if (body.password) {
+      body.password = await hashPassword(body.password);
     }
+
     next();
   } catch (error) {
     next(error);
