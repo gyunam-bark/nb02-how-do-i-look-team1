@@ -1,5 +1,6 @@
 import db from '../config/db.js';
-import bcrypt from 'bcrypt';
+import { comparePassword } from '../utils/compare-password.js';
+import { hashPassword } from '../utils/hash-password.js';
 
 // 답글 등록
 export const createCommentService = async ({ password, content, curationId }) => {
@@ -10,14 +11,16 @@ export const createCommentService = async ({ password, content, curationId }) =>
   });
 
   if (!curation) {
-    const error = new Error('존재하지 않습니다');
+    const error = new Error();
     error.statusCode = 404;
     throw error;
   }
 
-  if (!(await bcrypt.compare(password, curation.style.password))) {
-    const error = new Error('비밀번호가 틀렸습니다');
-    error.statusCode = 401;
+  const isMatch = await comparePassword(password, curation.style.password);
+
+  if (!isMatch) {
+    const error = new Error();
+    error.statusCode = 403;
     throw error;
   }
 
@@ -26,12 +29,12 @@ export const createCommentService = async ({ password, content, curationId }) =>
   });
 
   if (existing) {
-    const error = new Error('이미 댓글이 존재합니다');
+    const error = new Error();
     error.statusCode = 409;
     throw error;
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await hashPassword(password);
 
   const comment = await db.comment.create({
     data: {
@@ -60,14 +63,16 @@ export const updateCommentService = async ({ content, password, commentId }) => 
   });
 
   if (!comment) {
-    const error = new Error('존재하지 않습니다');
+    const error = new Error();
     error.statusCode = 404;
     throw error;
   }
 
-  if (!(await bcrypt.compare(password, comment.password))) {
-    const error = new Error('비밀번호가 틀렸습니다');
-    error.statusCode = 401;
+  const isMatch = await comparePassword(password, comment.password);
+
+  if (!isMatch) {
+    const error = new Error();
+    error.statusCode = 403;
     throw error;
   }
 
@@ -89,16 +94,19 @@ export const deleteCommentService = async ({ password, commentId }) => {
   });
 
   if (!comment) {
-    const error = new Error('존재하지 않습니다');
+    const error = new Error();
     error.statusCode = 404;
     throw error;
   }
 
-  if (!(await bcrypt.compare(password, comment.password))) {
-    const error = new Error('비밀번호가 틀렸습니다');
-    error.statusCode = 401;
+  const isMatch = await comparePassword(password, comment.password);
+
+  if (!isMatch) {
+    const error = new Error();
+    error.statusCode = 403;
     throw error;
   }
+
 
   await db.comment.delete({
     where: { commentId: comment.commentId },
