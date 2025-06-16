@@ -93,7 +93,7 @@ export const deleteStyle = async (styleId) => {
   return { message: '스타일이 삭제되었습니다.' };
 };
 
-export const createCuration = async ({ styleId, nickname, password, trendy, personality, practicality, costEffectiveness, content }) => {
+export const createCurationForStyle = async ({ styleId, nickname, password, trendy, personality, practicality, costEffectiveness, content }) => {
   const existingStyle = await db.style.findUnique({
     where: { styleId: +styleId },
   });

@@ -1,4 +1,6 @@
 import db from '../config/db.js';
+import { createCurationForStyle } from '../services/style-service.js';
+import { getCurationList } from '../services/style-service.js';
 // 유틸 함수
 async function getOrCreateTagIds(tagNames = []) {
   const tagObjs = [];
@@ -19,7 +21,7 @@ async function createImagesAndReturnIds(imageUrls = []) {
     const newImage = await db.image.create({ data: { imageUrl: img } });
     imageObjs.push({
       imageId: newImage.imageId,
-      imageUrl: newImage.imageUrl, 
+      imageUrl: newImage.imageUrl,
     });
   }
   return imageObjs;
@@ -89,13 +91,9 @@ export class StyleController {
       });
 
       // 응답 시 tags 순서 보장
-      const sortedTags = tags.filter((name) =>
-        newStyle.styleTags.some((st) => st.tag?.name === name)
-      );
+      const sortedTags = tags.filter((name) => newStyle.styleTags.some((st) => st.tag?.name === name));
       // 응답 시 imageUrls 순서 보장
-    const sortedImageUrls = imageUrls.filter((url) =>
-      newStyle.styleImages.some((si) => si.image?.imageUrl === url)
-    );
+      const sortedImageUrls = imageUrls.filter((url) => newStyle.styleImages.some((si) => si.image?.imageUrl === url));
       // API 명세서에 맞게 응답 형식 변경
       const response = {
         id: newStyle.styleId,
@@ -107,7 +105,7 @@ export class StyleController {
         createdAt: newStyle.createdAt,
         categories: categoriesArrayToObject(newStyle.categories),
         tags: sortedTags,
-        imageUrls: sortedImageUrls, 
+        imageUrls: sortedImageUrls,
       };
 
       res.status(201).json(response);
@@ -153,13 +151,13 @@ export class StyleController {
 
       const totalPages = Math.ceil(totalItemCount / pageSize);
       const currentPage = Number(page);
-      
+
       const data = styles.map((style) => ({
         id: style.styleId,
         thumbnail: style.styleImages?.[0]?.image?.imageUrl ?? null,
         nickname: style.nickname,
         title: style.title,
-        tags: style.styleTags?.map(st => st.tag?.name).filter(Boolean) || [],
+        tags: style.styleTags?.map((st) => st.tag?.name).filter(Boolean) || [],
         categories: categoriesArrayToObject(style.categories),
         content: style.content,
         viewCount: style.viewCount,
@@ -167,9 +165,8 @@ export class StyleController {
         createdAt: style.createdAt,
       }));
 
-      res
-        .set('Content-Type', 'application/json')
-        .send(JSON.stringify(
+      res.set('Content-Type', 'application/json').send(
+        JSON.stringify(
           {
             currentPage,
             totalPages,
@@ -177,7 +174,8 @@ export class StyleController {
             data,
           },
           jsonBigIntReplacer
-        ));
+        )
+      );
     } catch (err) {
       next(err);
     }
@@ -213,8 +211,8 @@ export class StyleController {
         curationCount: style.curationCount,
         createdAt: style.createdAt,
         categories: categoriesArrayToObject(style.categories),
-        tags: style.styleTags.map(st => st.tag?.name ?? '').filter(Boolean),
-        imageUrls: style.styleImages.map(si => si.image?.imageUrl ?? '').filter(Boolean),
+        tags: style.styleTags.map((st) => st.tag?.name ?? '').filter(Boolean),
+        imageUrls: style.styleImages.map((si) => si.image?.imageUrl ?? '').filter(Boolean),
       };
 
       res.set('Content-Type', 'application/json').send(JSON.stringify(response, jsonBigIntReplacer));
@@ -222,101 +220,91 @@ export class StyleController {
       next(err);
     }
   }
-  
- // 스타일 수정
- static async updateStyle(req, res, next) {
-  try {
-    const { styleId } = req.params;
-    const {
-      nickname,
-      password,
-      title,
-      content,
-      categories,
-      tags = [],
-      imageUrls = [],
-    } = req.body;
 
-    const style = await db.style.findUnique({ where: { styleId: +styleId } });
-    if (!style) {
-      return res.status(404).json({ message: '스타일을 찾을 수 없습니다.' });
-    }
-    if (style.password !== password) {
-      return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
-    }
+  // 스타일 수정
+  static async updateStyle(req, res, next) {
+    try {
+      const { styleId } = req.params;
+      const { nickname, password, title, content, categories, tags = [], imageUrls = [] } = req.body;
 
-    // categories 변환
-    let categoriesArr = [];
-    if (Array.isArray(categories)) {
-      categoriesArr = categories.map((cat) => ({
-        ...cat,
-        price: BigInt(cat.price),
-      }));
-    } else if (typeof categories === 'object') {
-      categoriesArr = Object.entries(categories).map(([key, value]) => ({
-        type: key.toUpperCase(),
-        ...value,
-        price: BigInt(value.price),
-      }));
-    }
+      const style = await db.style.findUnique({ where: { styleId: +styleId } });
+      if (!style) {
+        return res.status(404).json({ message: '스타일을 찾을 수 없습니다.' });
+      }
+      if (style.password !== password) {
+        return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
+      }
 
-    // tag, image 등록
-    const tagObjs = await getOrCreateTagIds(tags);
-    const imageObjs = await createImagesAndReturnIds(imageUrls);
+      // categories 변환
+      let categoriesArr = [];
+      if (Array.isArray(categories)) {
+        categoriesArr = categories.map((cat) => ({
+          ...cat,
+          price: BigInt(cat.price),
+        }));
+      } else if (typeof categories === 'object') {
+        categoriesArr = Object.entries(categories).map(([key, value]) => ({
+          type: key.toUpperCase(),
+          ...value,
+          price: BigInt(value.price),
+        }));
+      }
 
-    // 스타일 업데이트
-    const updatedStyle = await db.style.update({
-      where: { styleId: +styleId },
-      data: {
-        nickname,
-        title,
-        content,
-        categories: {
-          deleteMany: {},
-          create: categoriesArr,
+      // tag, image 등록
+      const tagObjs = await getOrCreateTagIds(tags);
+      const imageObjs = await createImagesAndReturnIds(imageUrls);
+
+      // 스타일 업데이트
+      const updatedStyle = await db.style.update({
+        where: { styleId: +styleId },
+        data: {
+          nickname,
+          title,
+          content,
+          categories: {
+            deleteMany: {},
+            create: categoriesArr,
+          },
+          styleTags: {
+            deleteMany: {},
+            create: tagObjs.map((obj) => ({
+              tag: { connect: { tagId: obj.tagId } },
+            })),
+          },
+          styleImages: {
+            deleteMany: {},
+            create: imageObjs.map((obj) => ({
+              image: { connect: { imageId: obj.imageId } },
+            })),
+          },
+          updatedAt: new Date(),
         },
-        styleTags: {
-          deleteMany: {},
-          create: tagObjs.map((obj) => ({
-            tag: { connect: { tagId: obj.tagId } },
-          })),
+        include: {
+          categories: true,
+          styleTags: { include: { tag: true } },
+          styleImages: { include: { image: true } },
         },
-        styleImages: {
-          deleteMany: {},
-          create: imageObjs.map((obj) => ({
-            image: { connect: { imageId: obj.imageId } },
-          })),
-        },
-        updatedAt: new Date(),
-      },
-      include: {
-        categories: true,
-        styleTags: { include: { tag: true } },
-        styleImages: { include: { image: true } },
-      },
-    });
+      });
 
-    // 응답 생성 (명세서 기준)
-    const response = {
-      id: updatedStyle.styleId,
-      nickname: updatedStyle.nickname,
-      title: updatedStyle.title,
-      content: updatedStyle.content,
-      viewCount: updatedStyle.viewCount,
-      curationCount: updatedStyle.curationCount,
-      createdAt: updatedStyle.createdAt,
-      categories: categoriesArrayToObject(updatedStyle.categories),
-      tags: updatedStyle.styleTags.map((st) => st.tag?.name ?? '').filter(Boolean),
-      imageUrls: updatedStyle.styleImages.map((si) => si.image?.imageUrl ?? '').filter(Boolean),
-    };
+      // 응답 생성 (명세서 기준)
+      const response = {
+        id: updatedStyle.styleId,
+        nickname: updatedStyle.nickname,
+        title: updatedStyle.title,
+        content: updatedStyle.content,
+        viewCount: updatedStyle.viewCount,
+        curationCount: updatedStyle.curationCount,
+        createdAt: updatedStyle.createdAt,
+        categories: categoriesArrayToObject(updatedStyle.categories),
+        tags: updatedStyle.styleTags.map((st) => st.tag?.name ?? '').filter(Boolean),
+        imageUrls: updatedStyle.styleImages.map((si) => si.image?.imageUrl ?? '').filter(Boolean),
+      };
 
-    res
-      .set('Content-Type', 'application/json')
-      .send(JSON.stringify(response, jsonBigIntReplacer));
-  } catch (err) {
-    next(err);
+      res.set('Content-Type', 'application/json').send(JSON.stringify(response, jsonBigIntReplacer));
+    } catch (err) {
+      next(err);
+    }
   }
-}
 
   // 스타일 삭제
   static async deleteStyle(req, res, next) {
@@ -353,7 +341,7 @@ export class StyleController {
 
       // 서비스 함수 호출
       const newCuration = await createCurationForStyle({
-        styleId: +styleId, 
+        styleId: +styleId,
         nickname,
         password,
         trendy,
@@ -362,8 +350,22 @@ export class StyleController {
         costEffectiveness,
         content,
       });
+      // console.log(`🚨newCuration:`, newCuration);
 
-      res.status(201).json(newCuration); 
+      // 명세서에 맞게 필요한 값만 뽑아서 응답
+      const response = {
+        id: newCuration.curationId,
+        nickname: newCuration.nickname,
+        content: newCuration.content,
+        trendy: newCuration.trendy,
+        personality: newCuration.personality,
+        practicality: newCuration.practicality,
+        costEffectiveness: newCuration.costEffectiveness,
+        createdAt: newCuration.createdAt,
+      };
+
+      res.status(200).json(response);
+      // console.log(`🚨response:`, response);
     } catch (err) {
       if (err.message === '스타일을 찾을 수 없습니다.') {
         return res.status(404).json({ message: err.message });
@@ -378,7 +380,7 @@ export class StyleController {
       const { styleId } = req.params;
       const { page, pageSize, searchBy, keyword } = req.query;
 
-      const curationsData = await getCurationListForStyle({
+      const curationsData = await getCurationList({
         styleId: +styleId,
         page,
         pageSize,
@@ -386,9 +388,47 @@ export class StyleController {
         keyword,
       });
 
-      res.status(200).json(curationsData); 
+      // 각 큐레이션 객체에 최신 댓글 1개(comment)를 붙임
+      const mappedData = curationsData.data.map((curation) => {
+        // 댓글이 있으면 최신 댓글 1개, 없으면 빈 객체
+        let comment = {};
+        if (curation.comments && curation.comments.length > 0) {
+          const latestComment = [...curation.comments].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+          comment = {
+            id: latestComment.commentId,
+            nickname: latestComment.nickname,
+            content: latestComment.content,
+            createdAt: latestComment.createdAt,
+          };
+        }
+
+        return {
+          id: curation.curationId,
+          nickname: curation.nickname,
+          content: curation.content,
+          trendy: curation.trendy,
+          personality: curation.personality,
+          practicality: curation.practicality,
+          costEffectiveness: curation.costEffectiveness,
+          createdAt: curation.createdAt,
+          comment, // 최신 댓글 1개 또는 빈 객체
+        };
+      });
+
+      const response = {
+        currentPage: curationsData.currentPage,
+        totalPages: curationsData.totalPages,
+        totalItemCount: curationsData.totalItemCount,
+        data: mappedData,
+      };
+
+      res.status(200).json(response);
+      console.log(`🚨curationsData:`, response);
     } catch (err) {
-      if (err.message === '페이지 및 페이지 크기는 1 이상의 유효한 숫자여야 합니다.' || err.message === '유효하지 않은 검색 기준입니다.') {
+      if (
+        err.message === '페이지 및 페이지 크기는 1 이상의 유효한 숫자여야 합니다.' ||
+        err.message === '유효하지 않은 검색 기준입니다.'
+      ) {
         return res.status(400).json({ message: err.message });
       }
       if (err.message === '스타일을 찾을 수 없습니다.') {
@@ -397,4 +437,4 @@ export class StyleController {
       next(err);
     }
   }
-}  
+}
