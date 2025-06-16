@@ -14,6 +14,7 @@ import errorHandler from './middlewares/error-middleware.js';
 import uploadsDir from './config/uploads-path.js';
 import rootRouter from './routes/root-routes.js';
 import logRouter from './routes/log-route.js';
+import docRouter from './routes/doc-route.js';
 
 export default class Server {
   #app;
@@ -55,6 +56,7 @@ export default class Server {
     this.#app.use('/curations', curationRouter);
     this.#app.use('/comments', commentRouter);
     this.#app.use('/logs', logRouter);
+    this.#app.use('/docs', docRouter);
   }
 
   // 에러 핸들러 등록
