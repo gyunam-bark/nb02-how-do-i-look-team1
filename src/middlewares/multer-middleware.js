@@ -1,5 +1,6 @@
 import multer from 'multer';
 import path from 'path';
+import { randomUUID } from 'crypto';
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -7,7 +8,9 @@ const upload = multer({
       cb(null, path.resolve('uploads'));
     },
     filename: function (req, file, cb) {
-      cb(null, new Date().valueOf() + path.extname(file.originalname));
+      const ext = path.extname(file.originalname);
+      const uniqueName = `${Date.now()}=${randomUUID()}${ext}`;
+      cb(null, uniqueName);
     },
   }),
 });
