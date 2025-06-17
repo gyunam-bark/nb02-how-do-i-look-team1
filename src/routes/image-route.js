@@ -10,5 +10,5 @@ const imageUploadController = new ImageUploadController();
 // 함수 반환하기 위해 bind 메서드 사용
 const imageUpload = imageUploadController.uploadImage.bind(imageUploadController);
 
-router.post('/upload', upload.array('many'), imageUpload);
+router.post('/upload', upload.single('image'), imageUpload);  // 필드명 수정
 export default router;
