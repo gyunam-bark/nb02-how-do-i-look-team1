@@ -63,7 +63,7 @@ const TITLE_MIN = 1;
 const TITLE_MAX = 64;
 const CONTENT_MIN = 1;
 const CONTENT_MAX = 256;
-const PASSWORD_MIN = 4;
+const PASSWORD_MIN = 8;
 const PASSWORD_MAX = 16;
 const NAME_MIN = 1;
 const NAME_MAX = 64;
@@ -348,7 +348,7 @@ export const validateRequest = (schema = {}) => {
       // NEXT TO CONTROLLER
       next();
     } catch (error) {
-      console.log('🟥 validateRequest error:', error); 
+      console.log('🟥 validateRequest error:', error);
       if (error instanceof StructError) {
         error.statusCode = 400;
         error.message = undefined;
