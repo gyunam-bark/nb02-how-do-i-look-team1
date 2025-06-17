@@ -25,18 +25,17 @@ async function main() {
 
   // 2. Seed 이미지
   const imageUrls = [
-    'https://img.example.com/style1.jpg',
-    'https://img.example.com/style2.jpg',
-    'https://img.example.com/style3.jpg',
-    'https://img.example.com/style4.jpg',
-    'https://img.example.com/style5.jpg',
-    'https://img.example.com/style6.jpg',
-    'https://img.example.com/style7.jpg',
-    'https://img.example.com/style8.jpg',
-    'https://img.example.com/style9.jpg',
-    'https://img.example.com/style10.jpg',
-    'https://img.example.com/style11.jpg',
-    'https://img.example.com/style12.jpg',
+    'https://storage.googleapis.com/nb02-how-do-i-look-storage.firebasestorage.app/images/__style_1750146858645.png?GoogleAccessId=firebase-adminsdk-fbsvc%40nb02-how-do-i-look-storage.iam.gserviceaccount.com&Expires=16730323200&Signature=stnPIB9XI98sgh4vqrG6hRj10ubtrmapoVUQPScSa1lNBx3VsI0LrujekCXG6as4fDjUpp%2BbnNwETbxMDFw7U0SQQJd7jn6GElR1r6NQHD38B8m1JDMwxZOIBHoc66UNb1U94LpDmBc5WyuJBPAd4tGx9aDU5uva8grXSTNHiSg9LQzLoIezW%2FBZNXOHNAVHx%2FqbWnCm4stixhekjPmbXJhQcg5%2F0XWfE8VLoXDHDqvrVoZSQOV2O15JF37D8m%2BQyoFxh7Q9XhFRWmg22R2aw3vDkq99TMdLY%2FSoxI2MiAqFLzVQnfl5arEV2Dn0WjBHWtSHJjcI9Qw7cN8PW6AMeA%3D%3D',
+    'https://storage.googleapis.com/nb02-how-do-i-look-storage.firebasestorage.app/images/__style_1750147311122.png?GoogleAccessId=firebase-adminsdk-fbsvc%40nb02-how-do-i-look-storage.iam.gserviceaccount.com&Expires=16730323200&Signature=nBP3QWpl2PIokjugWpxYlPI4mnT8mw0BAe3Dsd1HCXq1kja9dfMxE%2BtxUAFg%2BKTD4TXtBw%2FoXrA36Ltf6aQkLOxvXdTV3SXV%2BvdtCPn2DvID7Hw0CzGNX95qiscLyr75DueyZqjuvjkHzFLn5ouQAfTVeVFaSSJZNBFMrjycLB7KlBw9tET6RfK496vr%2B9ZntuXJx8WiYL6C7Tn8CxjRLaONhKE3O8gRj6pDuRChpwdsrR5cipzVUfR8B0h2xtDAOhV4jXBchJgHhZ0P%2BYi6M1Tn75upwlLK%2Fbx4OvWkPnfmH1Incs6ulS4zVtKtVRleOT45lbWZsMDzZlvlLziAEw%3D%3D',
+    'https://storage.googleapis.com/nb02-how-do-i-look-storage.firebasestorage.app/images/__style_1750147359056.png?GoogleAccessId=firebase-adminsdk-fbsvc%40nb02-how-do-i-look-storage.iam.gserviceaccount.com&Expires=16730323200&Signature=uHkbyHzqzHbqftejC5DjSp2W4Gy%2BlqNLXM43Ijd8QOl4Jfj6Or%2FQDWathfcnC%2BvWDCG27v%2Bc5e2xnpfiGGUGyYbWxfsMYIO2Al6AnWmkUkbhT4WuWYeZ0pJfLXm%2Bz%2Fp83pDKcYFK5tBXSGO2aOkm8l4bNMwJ1o6oMlihZWtkthrbAYBntu9RkE%2FajWhJEPY9dgr3gUDOZdh3u4mMMf%2BjMVpIAHWVv%2BWkKEHnvVmQSOmiC0A0uEc5WNNXCeKNKDgkVr%2BBtugMVBeRTeU042Nz0Qvlvr5zeFvr6L5XJffGMH47xWjn7JcZZQs65tJ7g5HIZABW%2Fi0D7UCgh1DTbKjC3A%3D%3D',
+    'https://storage.googleapis.com/nb02-how-do-i-look-storage.firebasestorage.app/images/__style_1750147393368.png?GoogleAccessId=firebase-adminsdk-fbsvc%40nb02-how-do-i-look-storage.iam.gserviceaccount.com&Expires=16730323200&Signature=hsorKJjtx%2BLYOCRhmAxgcWKSupyI91cnyxc5Uum%2FRPLXwb9McDH%2Fk2kgOiQ2Uk4O0RE0WYAT2dioJGyAy%2FGMvaC%2BaBfWdGiP2winC6Tw5IghlUSs5oLS1zF6nbFdjG1mQ%2BUr1txQP5JYMVoPc8WQ%2Fu%2BeZwZw%2BLVQu2oHmdQEa9oaiiW2I9nOerc99p%2BQ8KTR1jIkFga721my7pJGyKucKtDeRAjjrp2f3dv2p5ORCU39T0lwy1oulVL9gNyNkAKPKWhy50aP8WpLJlSLB6xU58qWIygfcBR69qvbeMaxg5ASM8IxuTFhnTkaRMruMzciLR5OxWVz17prNkTRngtSaw%3D%3D',
+    'https://storage.googleapis.com/nb02-how-do-i-look-storage.firebasestorage.app/images/__style_1750147439907.png?GoogleAccessId=firebase-adminsdk-fbsvc%40nb02-how-do-i-look-storage.iam.gserviceaccount.com&Expires=16730323200&Signature=H5cWC0dbtz35Co02wt3M6yoLSTkBKdf8r4DR79ezBRw8FcrCaYUyqUxTFH6CjXiVLu6m8Jz%2FvKaKjSUJhfbd368JWb%2Bo0djz%2FQRXodaB1uuNFER8VHLoBm5GsDIwOugKWf%2Btc%2BEMM5mz1J69qpXT3sIux3FgIX0TcZ5XhWxH1z4glmb10E9RDthjLHXjZeMuNHz3DybpYipmyPojznYGG7JI2BD39bSjRrIQOxn4EZyybDvhzNgxy9oJfmqr64EsTZZOucadxsvIpkYvWopfRUfAmaj%2Bvus55FNN1dla8r3Acu4U%2FEWwGJPSw%2FBZ0UpUGtKdEDzYWB%2B6IkVAwACGhQ%3D%3D',
+    'https://storage.googleapis.com/nb02-how-do-i-look-storage.firebasestorage.app/images/__style_1750147475464.png?GoogleAccessId=firebase-adminsdk-fbsvc%40nb02-how-do-i-look-storage.iam.gserviceaccount.com&Expires=16730323200&Signature=l%2FuQch2A2SL3xay8Grgxg05M9bWijjsdRJXdxQuHzaMtJED00jPOuGGCAyQqvS5tA8tPruo8jGs8lpP8YfPy2diQIYjH2%2B0kUm9GRsEYBhHda2urLlFAjpReCVTskNd2O1qclbLe1IeT7%2FiDmjMZtyG09f%2BEgXWV%2FiHzui30uAmhavi9oPEAoA%2Bs09QIhpcrI4SJfXtxv7FBURyM%2FggrMKfoVTKYm0fkoOD0C%2FMIUP2CasrzM%2B6VDeClupWB5NAaHzXVvwyw9IFqkovSO7%2FQNT1agONrC%2Fuovm%2BBT490fyinu5UhmQnXBMcKM2CSEi7D%2FWw5n7OymnGYs9hfUh8YgA%3D%3D',
+    'https://storage.googleapis.com/nb02-how-do-i-look-storage.firebasestorage.app/images/__style_1750147512146.png?GoogleAccessId=firebase-adminsdk-fbsvc%40nb02-how-do-i-look-storage.iam.gserviceaccount.com&Expires=16730323200&Signature=TPl8mMLlHyrVPrJpHQVISLOniMb%2F52npXZanpriGrghRpD3QGIVZqJUC0x3%2BnF0XJ2ejk51GdZG50YB6R1NFIyBPj9Z4Kc45RJm2vYICMwMyGY5EhhAc%2BjWg2%2FeBMZCJTiYjYuJtKXzo%2FvfJnZN%2BuzkHFVUuKypGK6CYH3dZxVwO73yCFT4f1JjdaT7kkj2IzSLj0tNZBFhoF9aGQIVZi21MzoOBwnmfjbWxw10f8V2yo8XyvqVeOrBj8bu8f2l7Yk5jNGFW8cHXiEAXEdvHG6MHxP9gV3xDxNGX0VRIdy%2BL2Oq0hI7dqvxGfyH7%2BBUimR5WDLxlRGh1qOoIklHMdA%3D%3D',
+    'https://storage.googleapis.com/nb02-how-do-i-look-storage.firebasestorage.app/images/__style_1750147546378.png?GoogleAccessId=firebase-adminsdk-fbsvc%40nb02-how-do-i-look-storage.iam.gserviceaccount.com&Expires=16730323200&Signature=kaW93yM7qSEOD7sb%2BsDwSeHS7G%2Bf%2FOtJMMaO2HEyOSnim3HvD%2BNoW92O%2FcVAlCuS%2FiQnUcJgBdGCLFxc9wy5pkycqAmYTkIRKCyrlLjKvGLI8mbeXya67O8uykkmEYwz42x0ahS4YK721rKQ9Il%2F8ThMy1Rwt39joSTPd2beRuLwBvL1BNCraUDVn57KzRgrPdWy0HsoM%2F8eUAzAZ3WmzXGiVHXBAdv8FiIkygkyhCjD8kSGmAnn2wJPnF%2FqNVS9pj98%2BGrIIv0YFUSPAEZu0cJM1h4GRhwYMcEvFbpHZ%2BPc3FZmHkT2qk349dvwH57AppswYweZraQfO3fd%2FqSIuw%3D%3D',
+    'https://storage.googleapis.com/nb02-how-do-i-look-storage.firebasestorage.app/images/__style_1750147696732.png?GoogleAccessId=firebase-adminsdk-fbsvc%40nb02-how-do-i-look-storage.iam.gserviceaccount.com&Expires=16730323200&Signature=cGjHyJBJ9mkIJODCzyoX2lfoQwMwngqg76NRO4st6UVITB2yb4U0X%2BkvMrJmIDaIhEKaNfZgoe9udJ1ntuBz2IFD1h9yoMNkkwExSArQ7XL6M99%2FDhBz9x7MgBuRZd8cfshQJ4NzehhDc4cDFODrbScsD4TxAMu44hwm8pthu5hucGx2oOT%2FJxVtg3fHhpNf8O4KHvrYkoru6loPeYcHgxz8mQWbInDlhuW1HQig2sg9hWRZl%2BoNVSLfNBKivywWqtCQTi9feW5vOqyAE0vbgxHhRuwWDhZf6Vxnf0Cbi15CZsUhc%2BUa35vsq73jCDSo3H%2B0SPav4O%2B2WQAUvB5YGg%3D%3D',
+    'https://storage.googleapis.com/nb02-how-do-i-look-storage.firebasestorage.app/images/__style_1750147730484.png?GoogleAccessId=firebase-adminsdk-fbsvc%40nb02-how-do-i-look-storage.iam.gserviceaccount.com&Expires=16730323200&Signature=Ya9SiaoE4dzsJ9WZi19RdWfpwzwGo0%2BXKUKZGalJloFSv37kfLlvlzMkB34Yn914MyQWbsoGorOgAvFauG%2BRVA%2FD4SUPyR08YIlpGgv9KJUaO15IHpu1Gi72RIFtMUYZ5bELXliWJayx%2BbeyXoiZEB28xdWCwDJn73%2F9kG%2BDnSeR62AzTYscDML8qlaCnFTa3jlpra6No%2BtC4mioHFpVSsue1laqGk%2Ft97BNSMF1qkDMRinvliiBhKQEFvBK04G2sAQB3lxwfHLqX5X9NjoOjJ%2FEyhVyNFeL9SWHE6jsGXbl2ffRQ9f3FiUg2n250aurj8iTlsvNgPBswasEhA8REQ%3D%3D',
+    
   ];
   const images = await Promise.all(imageUrls.map(url => prisma.image.create({ data: { imageUrl: url } })));
 
@@ -91,7 +90,7 @@ async function main() {
         { type: 'BOTTOM', name: '옐로우 스커트', brand: '자라', price: 39000n }
       ],
       tagNames: ['컬러풀', '여름', '러블리'],
-      imageIdx: [4, 5]
+      imageIdx: [4]
     },
     {
       nickname: '보검',
@@ -104,7 +103,7 @@ async function main() {
         { type: 'ACCESSORY', name: '볼캡', brand: '뉴에라', price: 35000n }
       ],
       tagNames: ['스트릿', '캐주얼'],
-      imageIdx: [6]
+      imageIdx: [5]
     },
     {
       nickname: '미현',
@@ -116,7 +115,7 @@ async function main() {
         { type: 'SHOES', name: '메리제인 슈즈', brand: '바바라', price: 59000n }
       ],
       tagNames: ['러블리', '여름'],
-      imageIdx: [7]
+      imageIdx: [6]
     },
     {
       nickname: '영지',
@@ -129,7 +128,7 @@ async function main() {
         { type: 'SHOES', name: '롱부츠', brand: '닥터마틴', price: 179000n }
       ],
       tagNames: ['겨울', '포멀'],
-      imageIdx: [8, 9]
+      imageIdx: [7]
     },
     {
       nickname: '민규',
@@ -142,7 +141,7 @@ async function main() {
         { type: 'SHOES', name: '스니커즈', brand: '뉴발란스', price: 99000n }
       ],
       tagNames: ['스포티', '캐주얼'],
-      imageIdx: [10]
+      imageIdx: [8]
     },
     {
       nickname: '혜윤',
@@ -154,7 +153,7 @@ async function main() {
         { type: 'BAG', name: '컬러백', brand: '코치', price: 159000n }
       ],
       tagNames: ['미니멀', '컬러풀'],
-      imageIdx: [11]
+      imageIdx: [9]
     },
     {
       nickname: '재욱',
@@ -167,7 +166,7 @@ async function main() {
         { type: 'SHOES', name: '더비슈즈', brand: '닥터마틴', price: 139000n }
       ],
       tagNames: ['포멀', '캐주얼'],
-      imageIdx: [0, 4]
+      imageIdx: [0, 9]
     }
   ];
 
