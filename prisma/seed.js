@@ -53,7 +53,7 @@ async function main() {
         { type: 'SHOES', name: '샌들', brand: '버켄스탁', price: 129000n }
       ],
       tagNames: ['미니멀', '여름'],
-      imageIdx: [0, 1]
+      imageIdx: [0]
     },
     {
       nickname: '승관',
@@ -65,7 +65,7 @@ async function main() {
         { type: 'BOTTOM', name: '데님팬츠', brand: '지오다노', price: 59000n }
       ],
       tagNames: ['빈티지', '캐주얼'],
-      imageIdx: [2]
+      imageIdx: [1]
     },
     {
       nickname: '우재',
@@ -78,7 +78,7 @@ async function main() {
         { type: 'SHOES', name: '로퍼', brand: '닥터마틴', price: 139000n }
       ],
       tagNames: ['포멀'],
-      imageIdx: [3]
+      imageIdx: [2]
     },
     {
       nickname: '미주',
@@ -90,7 +90,7 @@ async function main() {
         { type: 'BOTTOM', name: '옐로우 스커트', brand: '자라', price: 39000n }
       ],
       tagNames: ['컬러풀', '여름', '러블리'],
-      imageIdx: [4]
+      imageIdx: [3]
     },
     {
       nickname: '보검',
@@ -103,7 +103,7 @@ async function main() {
         { type: 'ACCESSORY', name: '볼캡', brand: '뉴에라', price: 35000n }
       ],
       tagNames: ['스트릿', '캐주얼'],
-      imageIdx: [5]
+      imageIdx: [4]
     },
     {
       nickname: '미현',
@@ -115,7 +115,7 @@ async function main() {
         { type: 'SHOES', name: '메리제인 슈즈', brand: '바바라', price: 59000n }
       ],
       tagNames: ['러블리', '여름'],
-      imageIdx: [6]
+      imageIdx: [5]
     },
     {
       nickname: '영지',
@@ -128,7 +128,7 @@ async function main() {
         { type: 'SHOES', name: '롱부츠', brand: '닥터마틴', price: 179000n }
       ],
       tagNames: ['겨울', '포멀'],
-      imageIdx: [7]
+      imageIdx: [6]
     },
     {
       nickname: '민규',
@@ -141,7 +141,7 @@ async function main() {
         { type: 'SHOES', name: '스니커즈', brand: '뉴발란스', price: 99000n }
       ],
       tagNames: ['스포티', '캐주얼'],
-      imageIdx: [8]
+      imageIdx: [7]
     },
     {
       nickname: '혜윤',
@@ -153,7 +153,7 @@ async function main() {
         { type: 'BAG', name: '컬러백', brand: '코치', price: 159000n }
       ],
       tagNames: ['미니멀', '컬러풀'],
-      imageIdx: [9]
+      imageIdx: [8]
     },
     {
       nickname: '재욱',
@@ -166,7 +166,7 @@ async function main() {
         { type: 'SHOES', name: '더비슈즈', brand: '닥터마틴', price: 139000n }
       ],
       tagNames: ['포멀', '캐주얼'],
-      imageIdx: [0, 9]
+      imageIdx: [9]
     }
   ];
 
