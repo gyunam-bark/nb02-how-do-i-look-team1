@@ -1,0 +1,12 @@
+{
+  "name": "Image",
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/images/upload",
+      "body": {
+        "many": "image"
+      }
+    }
+  ]
+}
