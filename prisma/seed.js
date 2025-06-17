@@ -35,7 +35,7 @@ async function main() {
     'https://storage.googleapis.com/nb02-how-do-i-look-storage.firebasestorage.app/images/__style_1750147546378.png?GoogleAccessId=firebase-adminsdk-fbsvc%40nb02-how-do-i-look-storage.iam.gserviceaccount.com&Expires=16730323200&Signature=kaW93yM7qSEOD7sb%2BsDwSeHS7G%2Bf%2FOtJMMaO2HEyOSnim3HvD%2BNoW92O%2FcVAlCuS%2FiQnUcJgBdGCLFxc9wy5pkycqAmYTkIRKCyrlLjKvGLI8mbeXya67O8uykkmEYwz42x0ahS4YK721rKQ9Il%2F8ThMy1Rwt39joSTPd2beRuLwBvL1BNCraUDVn57KzRgrPdWy0HsoM%2F8eUAzAZ3WmzXGiVHXBAdv8FiIkygkyhCjD8kSGmAnn2wJPnF%2FqNVS9pj98%2BGrIIv0YFUSPAEZu0cJM1h4GRhwYMcEvFbpHZ%2BPc3FZmHkT2qk349dvwH57AppswYweZraQfO3fd%2FqSIuw%3D%3D',
     'https://storage.googleapis.com/nb02-how-do-i-look-storage.firebasestorage.app/images/__style_1750147696732.png?GoogleAccessId=firebase-adminsdk-fbsvc%40nb02-how-do-i-look-storage.iam.gserviceaccount.com&Expires=16730323200&Signature=cGjHyJBJ9mkIJODCzyoX2lfoQwMwngqg76NRO4st6UVITB2yb4U0X%2BkvMrJmIDaIhEKaNfZgoe9udJ1ntuBz2IFD1h9yoMNkkwExSArQ7XL6M99%2FDhBz9x7MgBuRZd8cfshQJ4NzehhDc4cDFODrbScsD4TxAMu44hwm8pthu5hucGx2oOT%2FJxVtg3fHhpNf8O4KHvrYkoru6loPeYcHgxz8mQWbInDlhuW1HQig2sg9hWRZl%2BoNVSLfNBKivywWqtCQTi9feW5vOqyAE0vbgxHhRuwWDhZf6Vxnf0Cbi15CZsUhc%2BUa35vsq73jCDSo3H%2B0SPav4O%2B2WQAUvB5YGg%3D%3D',
     'https://storage.googleapis.com/nb02-how-do-i-look-storage.firebasestorage.app/images/__style_1750147730484.png?GoogleAccessId=firebase-adminsdk-fbsvc%40nb02-how-do-i-look-storage.iam.gserviceaccount.com&Expires=16730323200&Signature=Ya9SiaoE4dzsJ9WZi19RdWfpwzwGo0%2BXKUKZGalJloFSv37kfLlvlzMkB34Yn914MyQWbsoGorOgAvFauG%2BRVA%2FD4SUPyR08YIlpGgv9KJUaO15IHpu1Gi72RIFtMUYZ5bELXliWJayx%2BbeyXoiZEB28xdWCwDJn73%2F9kG%2BDnSeR62AzTYscDML8qlaCnFTa3jlpra6No%2BtC4mioHFpVSsue1laqGk%2Ft97BNSMF1qkDMRinvliiBhKQEFvBK04G2sAQB3lxwfHLqX5X9NjoOjJ%2FEyhVyNFeL9SWHE6jsGXbl2ffRQ9f3FiUg2n250aurj8iTlsvNgPBswasEhA8REQ%3D%3D',
-  
+ 
   ];
   const images = await Promise.all(imageUrls.map(url => prisma.image.create({ data: { imageUrl: url } })));
 
@@ -53,7 +53,7 @@ async function main() {
         { type: 'SHOES', name: '샌들', brand: '버켄스탁', price: 129000n }
       ],
       tagNames: ['미니멀', '여름'],
-      imageIdx: [0, 1]
+      imageIdx: [0]
     },
     {
       nickname: '승관',
@@ -65,7 +65,7 @@ async function main() {
         { type: 'BOTTOM', name: '데님팬츠', brand: '지오다노', price: 59000n }
       ],
       tagNames: ['빈티지', '캐주얼'],
-      imageIdx: [2]
+      imageIdx: [1]
     },
     {
       nickname: '우재',
@@ -78,7 +78,7 @@ async function main() {
         { type: 'SHOES', name: '로퍼', brand: '닥터마틴', price: 139000n }
       ],
       tagNames: ['포멀'],
-      imageIdx: [3]
+      imageIdx: [2]
     },
     {
       nickname: '미주',
@@ -90,7 +90,7 @@ async function main() {
         { type: 'BOTTOM', name: '옐로우 스커트', brand: '자라', price: 39000n }
       ],
       tagNames: ['컬러풀', '여름', '러블리'],
-      imageIdx: [4]
+      imageIdx: [3]
     },
     {
       nickname: '보검',
@@ -103,7 +103,7 @@ async function main() {
         { type: 'ACCESSORY', name: '볼캡', brand: '뉴에라', price: 35000n }
       ],
       tagNames: ['스트릿', '캐주얼'],
-      imageIdx: [5]
+      imageIdx: [4]
     },
     {
       nickname: '미현',
@@ -115,7 +115,7 @@ async function main() {
         { type: 'SHOES', name: '메리제인 슈즈', brand: '바바라', price: 59000n }
       ],
       tagNames: ['러블리', '여름'],
-      imageIdx: [6]
+      imageIdx: [5]
     },
     {
       nickname: '영지',
@@ -128,7 +128,7 @@ async function main() {
         { type: 'SHOES', name: '롱부츠', brand: '닥터마틴', price: 179000n }
       ],
       tagNames: ['겨울', '포멀'],
-      imageIdx: [7]
+      imageIdx: [6]
     },
     {
       nickname: '민규',
@@ -141,7 +141,7 @@ async function main() {
         { type: 'SHOES', name: '스니커즈', brand: '뉴발란스', price: 99000n }
       ],
       tagNames: ['스포티', '캐주얼'],
-      imageIdx: [8]
+      imageIdx: [7]
     },
     {
       nickname: '혜윤',
@@ -153,7 +153,7 @@ async function main() {
         { type: 'BAG', name: '컬러백', brand: '코치', price: 159000n }
       ],
       tagNames: ['미니멀', '컬러풀'],
-      imageIdx: [9]
+      imageIdx: [8]
     },
     {
       nickname: '재욱',
@@ -166,7 +166,7 @@ async function main() {
         { type: 'SHOES', name: '더비슈즈', brand: '닥터마틴', price: 139000n }
       ],
       tagNames: ['포멀', '캐주얼'],
-      imageIdx: [0,9]
+      imageIdx: [9]
     }
   ];
 
