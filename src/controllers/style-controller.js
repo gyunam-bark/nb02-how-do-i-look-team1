@@ -390,13 +390,12 @@ export class StyleController {
 
       // 각 큐레이션 객체에 최신 댓글 1개(comment)를 붙임
       const mappedData = curationsData.data.map((curation) => {
-        // 댓글이 있으면 최신 댓글 1개, 없으면 빈 객체
         let comment = {};
-        if (curation.comments && curation.comments.length > 0) {
-          const latestComment = [...curation.comments].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+        const latestComment = curation.comments;
+        if (curation.comments) {
           comment = {
             id: latestComment.commentId,
-            nickname: latestComment.nickname,
+            nickname: curation.style.nickname,
             content: latestComment.content,
             createdAt: latestComment.createdAt,
           };
@@ -422,8 +421,10 @@ export class StyleController {
         data: mappedData,
       };
 
+      console.log('🔍 mappedData 확인:', JSON.stringify(mappedData, null, 2));
+      console.log('📦 raw curationsData.data:', JSON.stringify(curationsData.data, jsonBigIntReplacer, 2));
+
       res.status(200).json(response);
-      console.log(`🚨curationsData:`, response);
     } catch (err) {
       if (
         err.message === '페이지 및 페이지 크기는 1 이상의 유효한 숫자여야 합니다.' ||
