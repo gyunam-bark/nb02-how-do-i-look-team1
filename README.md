@@ -281,15 +281,70 @@ flowchart TD
 
 (자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
 
-- [개인 개발 보고서]()
+- [개인 개발 보고서](https://github.com/hippo8427/how-do-i-look-report)
 
-- 기능 1
+**API**
 
-  - 세부설명 1
-  - 세부설명 2
+- Comment(/comments)
 
-- 기능 2
-  - 세부설명 1
+  - 큐레이션에 답글을 달기 위한 API
+  - [라우터 코드](./src/routes/comment-route.js)
+  - [컨트롤러 코드](./src/controllers/comment-controller.js)
+  - [서비스 코드](./src/services/comment-service.js)
+
+  - 요청 예시
+
+    ```json
+    {
+      "content": "string",
+      "password": "string"
+    }
+    ```
+
+  - 응답 예시
+    ```json
+    {
+      "id": 123,
+      "nickname": "string",
+      "content": "string",
+      "createdAt": "2024-02-22T07:47:49.803Z"
+    }
+    ```
+
+**MIDDLEWARE/UTIL**
+
+- PASSWORD HASHING (비밀번호 단방향 암호화)
+
+  - 보안을 위해 **답글 등록 시 `password` 필드**를 bcrypt를 사용해 단방향 해싱 처리
+  - [미들웨어 코드](./src/middlewares/bcrypt-middleware.js)
+
+    - [해싱 유틸 코드](./src/utils/hash-password.js)
+
+  - **수정/삭제 시 `password` 검증**을 위해  
+    요청의 평문 비밀번호와 저장된 해시된 비밀번호를 비교
+
+  - [인증 유틸 코드](./src/utils/compare-password.js)
+
+- **POST** 사용 예시
+
+```js
+import { hashPasswordMiddleware } from '../middlewares/bcrypt-middleware.js';
+
+router.post('/', validateRequest(createStyleSchema), hashPasswordMiddleware, StyleController.createStyle);
+```
+
+- **PUT/DELETE** 사용 예시
+
+```js
+import { comparePassword } from '../utils/compare-password.js';
+
+const isMatch = await comparePassword(plainPassword, hashedPassword);
+if (!isMatch) {
+  const error = new Error();
+  error.statusCode = 403;
+  throw error;
+}
+```
 
 ---
 
