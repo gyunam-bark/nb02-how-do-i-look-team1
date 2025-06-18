@@ -1,4 +1,9 @@
+import { PrismaClient } from '@prisma/client';
+const db = new PrismaClient();
+
 // 상태 코드에 따른 메시지 정의 객체
+// API 명세서에 정의된 상태 코드(400, 403, 404)
+// 나머지는 MDN 을 바탕으로 정의합니다.
 const statusMessages = {
   // 1xx: 정보 응답
   100: '계속 진행해도 좋습니다', // 요청의 일부를 받았으며 나머지를 계속 요청하라는 의미
@@ -88,19 +93,34 @@ const responseErrorService = (res = {}, statusCode = 500, message = '') => {
   res.status(statusCode).json(response);
 };
 
+const saveLogToDatabse = async (req = {}, statusCode = '', message = '') => {
+  const url = req.originalUrl || req.url || 'unknown';
+  const method = req.method;
+  const ip = req.ip || req.headers['x-forwarded-for'];
+
+
+  await db.log.create({
+    data: { ip, url, method, statusCode: String(statusCode), message },
+  });
+};
+
 // 글로벌 에러 핸들러
-const errorHandler = (error, req, res, _next) => {
+const errorHandler = async (error, req, res, _next) => {
   let statusCode = error.statusCode || 500;
-  let message = error.message;
 
   // 비정상적인 statusCode 처리
   if (statusCode < 100 || statusCode > 599) {
     statusCode = 500;
   }
 
-  if (!message) {
-    message = statusMessages[statusCode] || 'Internal Server Error';
-  }
+  // API 명세서 [심화 요구 사항]
+  // 일관된 에러처리 구현을 따라서 message 를 글로벌 에러 핸들러가 제어합니다.
+  // 기존 message 가 있는 경우에도 덮어씌웁니다.
+  // 예외사항은 없어야 하지만 혹시 모르기 때문에 기본값을 지정합니다.
+  const message = statusMessages[statusCode] || '서버 오류가 발생했습니다';
+
+  // LOG 저장
+  await saveLogToDatabse(req, statusCode, message);
 
   // DEV 로그
   responseErrorDev(error, req, statusCode, message);

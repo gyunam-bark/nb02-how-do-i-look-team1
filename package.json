@@ -6,11 +6,17 @@
     "node": ">=22.15.0"
   },
   "main": "index.js",
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "scripts": {
     "reset": "npx prisma migrate reset -f",
-    "migrate":"npx prisma migrate dev",
+    "migrate": "npx prisma migrate dev",
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write ."
   },
   "repository": {
     "type": "git",
@@ -25,12 +31,15 @@
   "homepage": "https://github.com/gyunam-bark/nb02-how-do-i-look-team1#readme",
   "dependencies": {
     "@prisma/client": "^6.8.2",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
+    "firebase-admin": "^13.4.0",
     "morgan": "^1.10.0",
-    "multer": "^2.0.0"
+    "multer": "^2.0.0",
+    "superstruct": "^2.0.2",
+    "swagger-ui-express": "^5.0.1"
   },
   "type": "module",
   "devDependencies": {
