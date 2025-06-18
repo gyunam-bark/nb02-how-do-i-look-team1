@@ -202,8 +202,6 @@ async function main() {
   }
 }
 
-
-
 const styleList = await prisma.style.findMany({ orderBy: { styleId: 'asc' } });
 
 const curationSeeds = [
@@ -334,8 +332,85 @@ for (const curation of curationSeeds) {
   });
 }
 console.log('큐레이션 시딩 완료!');
-}
 
+const curationList = await prisma.curation.findMany({ orderBy: { curationId: 'asc' } }); 
+
+// 댓글 시딩
+const commentSeeds = [
+  {
+    curationIdx: 0, 
+    content: '덥지만 단정하면서 시원해 보이게 신경썼어요',
+    password: 'password1234',
+  },
+  {
+    curationIdx: 1, 
+    content: '시원함과 편안함을 동시에 챙겨봤어요',
+    password: 'password1234',
+  },
+  {
+    curationIdx: 2, 
+    content: '청청패션 좀 과감하죠? 한번 도전해보세요!',
+    password: 'password1234',
+  },
+  {
+    curationIdx: 3, 
+    content: '아묻따 출근룩이죠!',
+    password: 'password1234',
+  },
+  {
+    curationIdx: 4, 
+    content: '처음 도전해보는 색상이예요 어울리나요?',
+    password: 'password1234',
+  },
+  {
+    curationIdx: 5, 
+    content: '힙 해보이나요? 스트릿룩은 처음이라 긴장되네요',
+    password: 'password1234',
+  },
+  {
+    curationIdx: 6, 
+    content: '남자친구랑 데이트할 때 입으려고 준비했어요',
+    password: 'password1234',
+  },
+  {
+    curationIdx: 7, 
+    content: '추워도 스타일은 포기할 수 없죠!',
+    password: 'password1234',
+  },
+  {
+    curationIdx: 8, 
+    content: '운동도 하고 패션도 챙기고 싶었어요',
+    password: 'password1234',
+  },
+  {
+    curationIdx: 9, 
+    content: '모던한 느낌의 가방이 포인트예요',
+    password: 'password1234',
+  },
+  {
+    curationIdx: 10, 
+    content: '여자친구 생기면 남친룩 한번 입어보고 싶었어요',
+    password: 'password1234',
+  },
+];
+
+// 댓글 생성
+for (const [i, comment] of commentSeeds.entries()) {
+  try {
+    await prisma.comment.create({
+      data: {
+        curationId: curationList[comment.curationIdx].curationId,
+        content: comment.content,
+        password: comment.password,
+      }
+    });
+    console.log(`[${i + 1}] 댓글 생성 성공!`);
+  } catch (e) {
+    console.error(`[${i + 1}] 댓글 생성 실패`, e);
+  }
+}
+console.log('댓글(Comment) 시딩 완료!');
+}
 main()
   .catch((e) => {
     console.error(e);
