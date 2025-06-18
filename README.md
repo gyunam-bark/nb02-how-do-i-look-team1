@@ -49,17 +49,17 @@ gantt
 
 ## 기술 스택
 
-|     분류     | 사용 도구                                                 |
-| :----------: | --------------------------------------------------------- |
-|    백엔드    | node.js, express.js                                       |
-|     ORM      | prisma                                                    |
-| 데이터베이스 | postgresql                                                |
-|  API 문서화  | swagger                                                   |
-|  협업 도구   | git, github, discord                                      |
-|  일정 관리   | github webhook, google runs function, google spread sheet |
-| 설치 패키지  | dotenv, morgan, multer, cors, bcrypt, superstruct         |
-|   스토리지   | google firebase                                           |
-|     배포     | render.com(프론트엔드,백엔드,데이터베이스)                |
+|     분류     | 사용 도구                                                                             |
+| :----------: | ------------------------------------------------------------------------------------- |
+|    백엔드    | node.js, express.js                                                                   |
+|     ORM      | prisma                                                                                |
+| 데이터베이스 | postgresql                                                                            |
+|  API 문서화  | swagger                                                                               |
+|  협업 도구   | git, github, discord                                                                  |
+|  일정 관리   | github webhook, google run function, google apps script, google spreadsheet           |
+| 설치 패키지  | dotenv, morgan, multer, cors, bcrypt, superstruct, firebase-admin, swagger-ui-express |
+|   스토리지   | google firebase                                                                       |
+|     배포     | render.com(프론트엔드,백엔드,데이터베이스)                                            |
 
 ---
 
@@ -105,19 +105,141 @@ flowchart TD
 
 ### 박규남
 
-(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
+![GYUNAM_PREVIEW](https://private-user-images.githubusercontent.com/194333354/456270587-2c8773c5-30e4-41fd-9b9a-a3b709cfeb02.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTAyMTA2NjksIm5iZiI6MTc1MDIxMDM2OSwicGF0aCI6Ii8xOTQzMzMzNTQvNDU2MjcwNTg3LTJjODc3M2M1LTMwZTQtNDFmZC05YjlhLWEzYjcwOWNmZWIwMi5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwNjE4JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDYxOFQwMTMyNDlaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1jNWQyODIyNGM5Mzk2MWE4MDViNWU5NzE3M2IzZmQyNzRmMzAxZWNkMjNiMTAzMTA0ZjNlMDIyNWUxYzU0ZDEwJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.0c0c5AWbWmhKNG2DobzGQKVZRsRF0hza_xjRyCNEHC4)
 
-- 기능 1
+- [개인 개발 보고서](https://github.com/gyunam-bark/nb02-how-do-i-look-report)
 
-  - 세부설명 1
-  - 세부설명 2
+**CI/CD**
 
-- 기능 2
-  - 세부설명 1
+- Github Issue 와 Google Spreadsheet 연동
+
+  - Issue 생성 시 팀 Gantt 시트 실시간 업데이트를 위한 연동
+  - [이슈 템플릿 문서](./.github/ISSUE_TEMPLATE/todo-template.md)
+  - Github Issue -> Google Run Function
+  - Google Run Function(Node.js, Axios) -> Google Apps Script
+  - Google Apps Script -> Google Spreadsheet
+
+- Github PR 과 Discord 연동
+
+  - PR 생성 시 팀 디스코드에 알림(@맨션) 을 하기 위한 연동
+  - [PR 템플릿 문서](./.github/PULL_REQUEST_TEMPLATE.md)
+  - [PR 깃허브 액션](./.github/workflows/pr-to-discord.yml)
+  - Github PR -> Github Actions
+  - Github Actions -> Discord
+
+**API**
+
+- Tag(/tags)
+
+  - 태그 목록을 받기 위한 API
+  - [라우터 코드](./src/routes/tag-route.js)
+  - [컨트롤러 코드](./src/controllers/tag-controller.js)
+  - [서비스 코드](./src/services/tag-service.js)
+  - 요청 예시
+
+    ```json
+
+    ```
+
+  - 응답 예시
+    ```json
+    {
+      "tags": ["string"]
+    }
+    ```
+
+- Log(/logs)
+
+  - 데이터베이스에 저장된 에러 로그 목록을 받기 위한 API
+  - [라우터 코드](./src/routes/log-route.js)
+  - [컨트롤러 코드](./src/controllers/log-controller.js)
+  - [서비스 코드](./src/services/log-service.js)
+  - [스키마](./prisma/schema.prisma#L118-L126)
+  - 요청 예시
+
+    ```json
+
+    ```
+
+  - 응답 예시
+    ```json
+    {
+      "totalItemCount": 0,
+      "data": [
+        {
+          "id": 1,
+          "ip": "string",
+          "url": "string",
+          "method": "string",
+          "statusCode": "string",
+          "message": "string",
+          "createdAt": "2025-06-18T01:02:32.664Z"
+        }
+      ]
+    }
+    ```
+
+- Health Check(/)
+
+  - 서버 헬스체크를 위한 API
+  - [라우터 코드](./src/routes/root-route.js)
+  - [컨트롤러 코드](./src/controllers/root-controller.js)
+  - 요청 예시
+
+    ```json
+
+    ```
+
+  - 응답 예시
+
+    ```json
+    {
+      "status": "OK",
+      "uptime": 0,
+      "timestamp": "2025-06-18T01:02:32.664Z"
+    }
+    ```
+
+**MIDDLEWARE**
+
+- DTO
+
+  - 파라미터를 검증하고, 필요에 따라 형변환을 하여 전달하기 위한 미들웨어
+  - [미들웨어 코드](./src/middlewares/dto-middleware.js)
+  - 각각의 파라미터 검증 후 req.validated 객체로 저장하여 Controller 에 전달
+  - 에러 발생 시 Global Error Handler 로 에러 전달
+
+- Global Error Handler
+  - 발생하는 모든 에러 상황에 메세지를 반환하기 위한 미들웨어
+  - [미들웨어 코드](./src/middlewares/error-middleware.js)
+  - 표준 statusCode 기반(MDN 기준)
+  - Service 반환 객체와 Dev 반환 객체가 다름
+
+**DEPLOY**
+
+- Swagger 연동
+
+  - API 테스트를 위한 Swagger 연동
+  - [라우터 코드](./src/routes/doc-route.js)
+  - [미들웨어 코드](./src/middlewares/swagger-middleware.js)
+  - [OPENAPI.JSON](./openapi.json)
+  - API 명세서 바탕으로 openapi.json 정리
+
+- 배포
+  - RENDER(front-end, back-end, postgresql)
+    - main 브랜치 커밋 연동
+  - GODADDY(\*.nbo2-howdoilook.com)
+  - DNS
+    | 분류 | CNAME / A |
+    | :----: | :----: |
+    | 프론트엔드 | www |
+    | 백엔드 | api |
 
 ### 권나현
 
 (자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
+
+- [개인 개발 보고서]()
 
 - 기능 1
 
@@ -131,6 +253,8 @@ flowchart TD
 
 (자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
 
+- [개인 개발 보고서]()
+
 - 기능 1
 
   - 세부설명 1
@@ -143,6 +267,8 @@ flowchart TD
 
 (자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
 
+- [개인 개발 보고서]()
+
 - 기능 1
 
   - 세부설명 1
@@ -154,6 +280,8 @@ flowchart TD
 ### 하상준
 
 (자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
+
+- [개인 개발 보고서]()
 
 - 기능 1
 
@@ -168,16 +296,76 @@ flowchart TD
 ## 파일 구조
 
 ```bash
-
+NB02-HOW-DO-I-LOOK-TEAM1
+┣ .github
+┃ ┣ ISSUE_TEMPLATE
+┃ ┃ ┣ todo-template.md
+┃ ┣ workflows
+┃ ┃ ┣ pr-to-discord.yml
+┃ ┣ PULL_REQUEST_TEMPLATE.md
+┣ prisma
+┃ ┣ schema.prisma
+┃ ┣ seed.js
+┣ src
+┃ ┣ config
+┃ ┃ ┣ db.js
+┃ ┃ ┣ firebase-admin.js
+┃ ┃ ┣ uploads-path.js
+┃ ┣ controllers
+┃ ┃ ┣ comment-controller.js
+┃ ┃ ┣ curation-controller.js
+┃ ┃ ┣ image-controller.js
+┃ ┃ ┣ log-controller.js
+┃ ┃ ┣ rank-controller.js
+┃ ┃ ┣ root-controller.js
+┃ ┃ ┣ style-controller.js
+┃ ┃ ┣ tag-controller.js
+┃ ┣ middlewares
+┃ ┃ ┣ bcrypt-middleware.js
+┃ ┃ ┣ dto-middleware.js
+┃ ┃ ┣ error-middleware.js
+┃ ┃ ┣ multer-middleware.js
+┃ ┃ ┣ swagger-middleware.js
+┃ ┣ routes
+┃ ┃ ┣ comment-route.js
+┃ ┃ ┣ curation-route.js
+┃ ┃ ┣ doc-route.js
+┃ ┃ ┣ image-route.js
+┃ ┃ ┣ log-route.js
+┃ ┃ ┣ rank-route.js
+┃ ┃ ┣ root-route.js
+┃ ┃ ┣ style-route.js
+┃ ┃ ┣ tag-route.js
+┃ ┣ services
+┃ ┃ ┣ comment-service.js
+┃ ┃ ┣ curation-service.js
+┃ ┃ ┣ image-service.js
+┃ ┃ ┣ log-service.js
+┃ ┃ ┣ rank-service.js
+┃ ┃ ┣ style-service.js
+┃ ┃ ┣ tag-service.js
+┃ ┣ utils
+┃ ┃ ┣ compare-password.js
+┃ ┃ ┣ hash-password.js
+┃ ┣ server.js
+┣ .env.example
+┣ .gitignore
+┣ .prettierrc
+┣ eslint.confing.js
+┣ index.js
+┣ openapi.json
+┣ package-lock.json
+┣ package.json
+┣ README.md
 ```
 
 ---
 
 ## 구현 홈페이지
 
-**프론트엔드**: [링크가 여기 들어갑니다.]()
+**프론트엔드**: [www.nb02-howdoilook.com](www.nb02-howdoilook.com)
 
-**백엔드**: [링크가 여기 들어갑니다.]()
+**백엔드**: [api.nb02-howdoilook.com](api.nb02-howdoilook.com)
 
 ---
 

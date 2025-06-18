@@ -328,9 +328,7 @@ export const getLogListSchema = {
 // ----------------------------------------------------------
 // CURRYING | MIDDLEWARE FACTORY 패턴
 export const validateRequest = (schema = {}) => {
-  return async (req = {}, res = {}, next) => {
-    // console.log('🟡 [validateRequest] req.params:', req.params);
-
+  return async (req = {}, _res = {}, next) => {
     try {
       req.validated = {
         body: schema.body ? create(req.body ?? {}, schema.body) : undefined,
@@ -338,17 +336,10 @@ export const validateRequest = (schema = {}) => {
         params: schema.params ? create(req.params ?? {}, schema.params) : undefined,
       };
 
-      // return res.json({
-      //   params: req.params,
-      //   path: req.path,
-      //   originalUrl: req.originalUrl,
-      //   url: req.url,
-      // });
-
       // NEXT TO CONTROLLER
       next();
     } catch (error) {
-      console.log('🟥 validateRequest error:', error);
+      console.log('validateRequest error:', error);
       if (error instanceof StructError) {
         error.statusCode = 400;
         error.message = undefined;
