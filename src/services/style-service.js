@@ -93,39 +93,47 @@ export const deleteStyle = async (styleId) => {
   return { message: '스타일이 삭제되었습니다.' };
 };
 
-export const createCurationForStyle = async ({ styleId, nickname, password, trendy, personality, practicality, costEffectiveness, content }) => {
-  const existingStyle = await db.style.findUnique({
-    where: { styleId: +styleId },
+export const createCurationForStyle = async ({
+  styleId,
+  nickname,
+  password,
+  trendy,
+  personality,
+  practicality,
+  costEffectiveness,
+  content,
+}) => {
+  const style = await db.style.findUnique({
+    where: { styleId: Number(styleId) },
   });
-  if (!existingStyle) {
+
+  if (!style) {
     throw new Error('스타일을 찾을 수 없습니다.');
   }
 
-  const newCuration = await db.curation.create({
-    data: {
-      styleId: +styleId,
-      nickname,
-      password: password,
-      trendy: +trendy,
-      personality: +personality,
-      practicality: +practicality,
-      costEffectiveness: +costEffectiveness,
-      content: content?.trim(),
-    },
-    include: {
-      comments: true,
-      style: {
-        include: {
-          categories: true,
-          styleTags: { include: { tag: true } },
-          styleImages: { include: { image: true } },
-          _count: { select: { curations: true } },
-        },
+  const [curation] = await db.$transaction([
+    db.curation.create({
+      data: {
+        styleId: Number(styleId),
+        nickname,
+        password,
+        trendy: Number(trendy),
+        personality: Number(personality),
+        practicality: Number(practicality),
+        costEffectiveness: Number(costEffectiveness),
+        content: content?.trim() ?? '',
       },
-    },
-  });
+    }),
 
-  return newCuration;
+    db.style.update({
+      where: { styleId: Number(styleId) },
+      data: {
+        curationCount: { increment: 1 },
+      },
+    }),
+  ]);
+
+  return curation;
 };
 
 // 스타일의 큐레이션 목록 조회

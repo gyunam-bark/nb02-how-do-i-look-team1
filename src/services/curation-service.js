@@ -64,7 +64,7 @@ export const getCurationListService = async ({ styleId, page, pageSize, searchBy
     }
   }
 
-  // 3. 총 아이템 개수 및 큐레이션 목록 조회 
+  // 3. 총 아이템 개수 및 큐레이션 목록 조회
   const [totalItemCount, curations] = await Promise.all([
     db.curation.count({ where }),
     db.curation.findMany({
@@ -73,7 +73,7 @@ export const getCurationListService = async ({ styleId, page, pageSize, searchBy
       take: parsedPageSize,
       orderBy: { createdAt: 'desc' },
       include: {
-        comments: true, 
+        comments: true,
       },
     }),
   ]);
@@ -139,9 +139,21 @@ export const deleteCurationService = async (curationId, password) => {
     throw new Error('비밀번호가 일치하지 않습니다.');
   }
 
-  // 3. 큐레이팅 삭제
-  await db.curation.delete({ where: { curationId: +curationId } });
+  // 3. 트랜잭션으로 삭제 + curationCount 감소
+  await db.$transaction([
+    db.curation.delete({
+      where: { curationId: +curationId },
+    }),
+    db.style.update({
+      where: { styleId: existingCuration.styleId },
+      data: {
+        curationCount: {
+          decrement: 1,
+        },
+      },
+    }),
+  ]);
 
-  // 4. 삭제 성공 메시지 반환 
+  // 4. 성공 응답
   return { message: '큐레이팅 삭제 성공' };
 };
