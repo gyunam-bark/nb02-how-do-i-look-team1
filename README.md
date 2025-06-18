@@ -8,13 +8,13 @@
 
 ## 팀원 구성
 
-|  이름  | 역할 | 담당 업무 | 깃허브                                                                 |
-| :----: | :--: | --------- | ---------------------------------------------------------------------- |
-| 박규남 | 팀장 |           | [https://github.com/gyunam-bark](https://github.com/gyunam-bark)       |
-| 권나현 | 팀원 |           | [https://github.com/kwonnahyun0125](https://github.com/kwonnahyun0125) |
-| 김슬비 | 팀원 |           | [https://github.com/stella62420](https://github.com/stella62420)       |
-| 김진솔 | 팀원 |           | [https://github.com/JINSOLdev](https://github.com/JINSOLdev5)          |
-| 하상준 | 팀원 |           | [https://github.com/hippo8427](https://github.com/hippo8427)           |
+|  이름  | 역할 | 담당 업무                                                                                                                                      | 깃허브                                                                 |
+| :----: | :--: | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| 박규남 | 팀장 | PM, Tag API, Log Api, Health Check API, DTO 미들웨어, Global Error Handler 미들웨어, PR-디스코드 연동, 이슈-구글 시트 연동, Swagger 연동, 배포 | [https://github.com/gyunam-bark](https://github.com/gyunam-bark)       |
+| 권나현 | 팀원 | Style API, Prisma Schema 설계, Seed 데이터 설계 및 작성                                                                                        | [https://github.com/kwonnahyun0125](https://github.com/kwonnahyun0125) |
+| 김슬비 | 팀원 | Curation API                                                                                                                                   | [https://github.com/stella62420](https://github.com/stella62420)       |
+| 김진솔 | 팀원 | Image API, Ranking API, Prisma Schema 설계                                                                                                     | [https://github.com/JINSOLdev](https://github.com/JINSOLdev5)          |
+| 하상준 | 팀원 | Comment API, 비밀번호 해싱/비교 유틸리티                                                                                                       | [https://github.com/hippo8427](https://github.com/hippo8427)           |
 
 ---
 
@@ -105,7 +105,7 @@ flowchart TD
 
 ### 박규남
 
-![GYUNAM_PREVIEW](https://private-user-images.githubusercontent.com/194333354/456270587-2c8773c5-30e4-41fd-9b9a-a3b709cfeb02.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTAyMTA2NjksIm5iZiI6MTc1MDIxMDM2OSwicGF0aCI6Ii8xOTQzMzMzNTQvNDU2MjcwNTg3LTJjODc3M2M1LTMwZTQtNDFmZC05YjlhLWEzYjcwOWNmZWIwMi5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwNjE4JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDYxOFQwMTMyNDlaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1jNWQyODIyNGM5Mzk2MWE4MDViNWU5NzE3M2IzZmQyNzRmMzAxZWNkMjNiMTAzMTA0ZjNlMDIyNWUxYzU0ZDEwJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.0c0c5AWbWmhKNG2DobzGQKVZRsRF0hza_xjRyCNEHC4)
+![GYUNAM_PREVIEW](https://github.com/user-attachments/assets/2c8773c5-30e4-41fd-9b9a-a3b709cfeb02)
 
 - [개인 개발 보고서](https://github.com/gyunam-bark/nb02-how-do-i-look-report)
 
