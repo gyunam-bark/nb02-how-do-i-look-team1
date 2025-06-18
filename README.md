@@ -279,8 +279,6 @@ flowchart TD
 
 ### 하상준
 
-(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
-
 - [개인 개발 보고서](https://github.com/hippo8427/how-do-i-look-report)
 
 **API**
