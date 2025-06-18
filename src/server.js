@@ -12,7 +12,7 @@ import rankRouter from './routes/rank-route.js';
 
 import errorHandler from './middlewares/error-middleware.js';
 import uploadsDir from './config/uploads-path.js';
-import rootRouter from './routes/root-routes.js';
+import rootRouter from './routes/root-route.js';
 import logRouter from './routes/log-route.js';
 import docRouter from './routes/doc-route.js';
 
