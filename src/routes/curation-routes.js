@@ -5,8 +5,8 @@ import { validateRequest, createCommentSchema } from '../middlewares/dto-middlew
 
 const router = Router();
 
-router.put('/:curationId', CurationController.updateCuration); //큐레이션 수정
-router.delete('/:curationId', CurationController.deleteCuration); //큐레이션 삭제
+router.put('/:curationId', validateRequest(updateCurationSchema), CurationController.updateCuration); //큐레이션 수정
+router.delete('/:curationId', validateRequest(deleteCurationSchema), CurationController.deleteCuration); //큐레이션 삭제
 
 router.post('/:curationId/comments', validateRequest(createCommentSchema), CommentController.createComment); // 답글 등록
 

@@ -333,11 +333,12 @@ export class StyleController {
       next(err);
     }
   }
+  
   // 스타일에 대한 큐레이션 생성 (POST /styles/:styleId/curations)
   static async createCuration(req, res, next) {
     try {
-      const { styleId } = req.params;
-      const { nickname, password, trendy, personality, practicality, costEffectiveness, content } = req.body;
+      const { styleId } = req.validated.params
+      const { nickname, password, trendy, personality, practicality, costEffectiveness, content } = req.validated.body
 
       // 서비스 함수 호출
       const newCuration = await createCurationForStyle({
@@ -377,8 +378,8 @@ export class StyleController {
   // 스타일에 대한 큐레이션 목록 조회 (GET /styles/:styleId/curations)
   static async getCurationList(req, res, next) {
     try {
-      const { styleId } = req.params;
-      const { page, pageSize, searchBy, keyword } = req.query;
+      const { styleId } = req.validated.params;
+      const { page, pageSize, searchBy, keyword } = req.validated.query;
 
       const curationsData = await getCurationList({
         styleId: +styleId,

@@ -1,6 +1,7 @@
 import db from '../config/db.js';
+import { comparePassword } from '../utils/compare-password.js';
+import { hashPassword } from '../utils/hash-password.js';
 
-// [수정] 함수명 원상 복구 (Service 접미사 추가)
 export const createCurationService = async ({
   styleId,
   nickname,
@@ -17,7 +18,18 @@ export const createCurationService = async ({
   });
 
   if (!existingStyle) {
-    throw new Error('해당 스타일을 찾을 수 없습니다.');
+    const error = new Error('해당 스타일을 찾을 수 없습니다.');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  // 비밀번호 해싱
+  let hashedPassword = password;
+  // 비밀번호가 해시된 상태인지 아닌지 판단(불필요한 재해싱 방지용)
+  if (!password.startsWith('$2a$') && !password.startsWith('$2b$')) {
+    hashedPassword = await hashPassword(password);
+  } else {
+    console.log('Password appears to be already hashed. Skipping re-hashing.');
   }
 
   // 2. 큐레이션 데이터 생성 (포맷팅 없이 Prisma 원본 객체 반환)
@@ -25,7 +37,7 @@ export const createCurationService = async ({
     data: {
       styleId: +styleId,
       nickname,
-      password: password,
+      password: hashedPassword,
       trendy: +trendy,
       personality: +personality,
       practicality: +practicality,
@@ -42,14 +54,18 @@ export const getCurationListService = async ({ styleId, page, pageSize, searchBy
   const parsedPageSize = parseInt(pageSize || 10);
 
   if (parsedPage < 1 || parsedPageSize < 1) {
-    throw new Error('페이지 및 페이지 크기는 1 이상의 유효한 숫자여야 합니다.');
+    const error = new Error('페이지 및 페이지 크기는 1 이상의 유효한 숫자여야 합니다.');
+    error.statusCode = 400;
+    throw error;
   }
 
   const existingStyle = await db.style.findUnique({
     where: { styleId: +styleId },
   });
   if (!existingStyle) {
-    throw new Error('해당 스타일을 찾을 수 없습니다.');
+    const error = new Error('해당 스타일을 찾을 수 없습니다.');
+    error.statusCode = 404;
+    throw error;
   }
 
   // 2. 검색 조건
@@ -60,7 +76,9 @@ export const getCurationListService = async ({ styleId, page, pageSize, searchBy
     } else if (searchBy === 'content') {
       where.content = { contains: keyword, mode: 'insensitive' };
     } else {
-      throw new Error('유효하지 않은 검색 기준입니다.');
+      const error = new Error('유효하지 않은 검색 기준입니다.');
+      error.statusCode = 400;
+      throw error;
     }
   }
 
@@ -100,11 +118,15 @@ export const updateCurationService = async (
   });
 
   if (!existingCuration) {
-    throw new Error('큐레이팅을 찾을 수 없습니다.');
+    const error = new Error('큐레이팅을 찾을 수 없습니다.');
+    error.statusCode = 404;
+    throw error;
   }
-  // 2. 비밀번호 일치 확인
-  if (existingCuration.password !== password) {
-    throw new Error('비밀번호가 일치하지 않습니다.');
+  // 2. 비밀번호 일치 확인 comparePassword
+  if (!await comparePassword(password, existingCuration.password)) {
+    const error = new Error('비밀번호가 일치하지 않습니다.');
+    error.statusCode = 403;
+    throw error;
   }
 
   // 3. 큐레이팅 데이터 업데이트
@@ -131,12 +153,16 @@ export const deleteCurationService = async (curationId, password) => {
   });
 
   if (!existingCuration) {
-    throw new Error('큐레이팅을 찾을 수 없습니다.');
+    const error = new Error('큐레이팅을 찾을 수 없습니다.');
+    error.statusCode = 404;
+    throw error;
   }
 
-  // 2. 비밀번호 일치 확인
-  if (existingCuration.password !== password) {
-    throw new Error('비밀번호가 일치하지 않습니다.');
+  // 2. 비밀번호 일치 확인 comparePassword
+  if (!await comparePassword(password, existingCuration.password)) {
+    const error = new Error('비밀번호가 일치하지 않습니다.');
+    error.statusCode = 403;
+    throw error;
   }
 
   // 3. 트랜잭션으로 삭제 + curationCount 감소
