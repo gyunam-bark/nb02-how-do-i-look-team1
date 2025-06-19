@@ -260,7 +260,9 @@ export const updateCurationSchema = {
 };
 // DELETE:CURATION
 export const deleteCurationSchema = {
-  body: object({}),
+  body: object({
+    password: password,
+  }),
   query: object({}),
   params: object({
     curationId: id,

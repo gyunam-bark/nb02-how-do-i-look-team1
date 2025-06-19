@@ -1,4 +1,5 @@
 import db from '../config/db.js';
+import { hashPassword } from '../utils/hash-password.js';
 
 // 스타일 등록
 export const createStyle = async ({ nickname, title, content, password, categories, tags, images }) => {
@@ -93,6 +94,7 @@ export const deleteStyle = async (styleId) => {
   return { message: '스타일이 삭제되었습니다.' };
 };
 
+// 스타일의 큐레이팅 생성
 export const createCurationForStyle = async ({
   styleId,
   nickname,
@@ -108,7 +110,19 @@ export const createCurationForStyle = async ({
   });
 
   if (!style) {
-    throw new Error('스타일을 찾을 수 없습니다.');
+    const error = new Error('스타일을 찾을 수 없습니다.');
+    error.statusCode = 404; 
+    throw error;
+  }
+
+  // 비밀번호 해싱
+  let hashedPassword = password;
+
+  // 비밀번호가 해시된 상태인지 아닌지 판단(불필요한 재해싱 방지용)
+  if (!password.startsWith('$2a$') && !password.startsWith('$2b$')) {
+    hashedPassword = await hashPassword(password);
+  } else {
+    console.log('Password appears to be already hashed. Skipping re-hashing.');
   }
 
   const [curation] = await db.$transaction([
@@ -116,7 +130,7 @@ export const createCurationForStyle = async ({
       data: {
         styleId: Number(styleId),
         nickname,
-        password,
+        password: hashedPassword,
         trendy: Number(trendy),
         personality: Number(personality),
         practicality: Number(practicality),
@@ -142,14 +156,18 @@ export const getCurationList = async ({ styleId, page, pageSize, searchBy, keywo
   const parsedPageSize = parseInt(pageSize || 10);
 
   if (parsedPage < 1 || parsedPageSize < 1) {
-    throw new Error('페이지 및 페이지 크기는 1 이상의 유효한 숫자여야 합니다.');
+    const error = new Error('페이지 및 페이지 크기는 1 이상의 유효한 숫자여야 합니다.');
+    error.statusCode = 400;
+    throw error;
   }
 
   const existingStyle = await db.style.findUnique({
     where: { styleId: +styleId },
   });
   if (!existingStyle) {
-    throw new Error('스타일을 찾을 수 없습니다.');
+    const error = new Error('스타일을 찾을 수 없습니다.');
+    error.statusCode = 404;
+    throw error;
   }
 
   let where = { styleId: +styleId };
@@ -159,7 +177,9 @@ export const getCurationList = async ({ styleId, page, pageSize, searchBy, keywo
     } else if (searchBy === 'content') {
       where.content = { contains: keyword, mode: 'insensitive' };
     } else {
-      throw new Error('유효하지 않은 검색 기준입니다.');
+      const error = new Error('유효하지 않은 검색 기준입니다.');
+      error.statusCode = 400;
+      throw error;
     }
   }
 

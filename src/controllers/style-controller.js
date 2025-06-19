@@ -1,6 +1,8 @@
 import db from '../config/db.js';
 import { createCurationForStyle } from '../services/style-service.js';
 import { getCurationList } from '../services/style-service.js';
+import { comparePassword } from '../utils/compare-password.js';
+
 // 유틸 함수
 async function getOrCreateTagIds(tagNames = []) {
   const tagObjs = [];
@@ -46,7 +48,7 @@ function categoriesArrayToObject(categoriesArr) {
 export class StyleController {
   static async createStyle(req, res, next) {
     try {
-      const { nickname, title, content, password, categories, tags = [], imageUrls = [] } = req.body;
+      const { nickname, title, content, password, categories, tags = [], imageUrls = [] } = req.validated.body;
 
       let categoriesArr = [];
       if (Array.isArray(categories)) {
@@ -116,7 +118,7 @@ export class StyleController {
   // 스타일 목록 조회
   static async getStyleList(req, res, next) {
     try {
-      const { page = 1, pageSize = 10, sort = 'latest', search } = req.query;
+      const { page = 1, pageSize = 10, sort = 'latest', search } = req.validated.query;
 
       const where = search
         ? {
@@ -183,7 +185,7 @@ export class StyleController {
   // 스타일 상세 조회
   static async getStyleDetail(req, res, next) {
     try {
-      const { styleId } = req.params;
+      const { styleId } = req.validated.params;
 
       await db.style.update({
         where: { styleId: +styleId },
@@ -224,15 +226,20 @@ export class StyleController {
   // 스타일 수정
   static async updateStyle(req, res, next) {
     try {
-      const { styleId } = req.params;
-      const { nickname, password, title, content, categories, tags = [], imageUrls = [] } = req.body;
+      const { styleId } = req.validated.params;
+      const { nickname, password, title, content, categories, tags = [], imageUrls = [] } = req.validated.body;
 
       const style = await db.style.findUnique({ where: { styleId: +styleId } });
       if (!style) {
         return res.status(404).json({ message: '스타일을 찾을 수 없습니다.' });
       }
-      if (style.password !== password) {
-        return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
+
+      const isMatch = await comparePassword(password, style.password);
+
+      if (!isMatch) {
+        const error = new Error('비밀번호가 일치하지 않습니다.');
+        error.statusCode = 403;
+        throw error;
       }
 
       // categories 변환
@@ -309,8 +316,8 @@ export class StyleController {
   // 스타일 삭제
   static async deleteStyle(req, res, next) {
     try {
-      const { styleId } = req.params;
-      const { password } = req.body;
+      const { styleId } = req.validated.params;
+      const { password } = req.validated.body;
 
       const style = await db.style.findUnique({ where: { styleId: +styleId } });
 
@@ -318,9 +325,14 @@ export class StyleController {
         return res.status(404).json({ message: '스타일을 찾을 수 없습니다.' });
       }
 
-      if (style.password !== password) {
-        return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
+      const isMatch = await comparePassword(password, style.password);
+
+      if (!isMatch) {
+        const error = new Error('비밀번호가 일치하지 않습니다.');
+        error.statusCode = 403;
+        throw error;
       }
+
       // 관련된 카테고리, 태그, 이미지 삭제
       await db.category.deleteMany({ where: { styleId: +styleId } });
       await db.styleTag.deleteMany({ where: { styleId: +styleId } });
@@ -333,11 +345,12 @@ export class StyleController {
       next(err);
     }
   }
+
   // 스타일에 대한 큐레이션 생성 (POST /styles/:styleId/curations)
   static async createCuration(req, res, next) {
     try {
-      const { styleId } = req.params;
-      const { nickname, password, trendy, personality, practicality, costEffectiveness, content } = req.body;
+      const { styleId } = req.validated.params;
+      const { nickname, password, trendy, personality, practicality, costEffectiveness, content } = req.validated.body;
 
       // 서비스 함수 호출
       const newCuration = await createCurationForStyle({
@@ -377,8 +390,8 @@ export class StyleController {
   // 스타일에 대한 큐레이션 목록 조회 (GET /styles/:styleId/curations)
   static async getCurationList(req, res, next) {
     try {
-      const { styleId } = req.params;
-      const { page, pageSize, searchBy, keyword } = req.query;
+      const { styleId } = req.validated.params;
+      const { page, pageSize, searchBy, keyword } = req.validated.query;
 
       const curationsData = await getCurationList({
         styleId: +styleId,
