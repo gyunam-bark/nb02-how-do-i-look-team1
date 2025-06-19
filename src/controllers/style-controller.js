@@ -46,7 +46,7 @@ function categoriesArrayToObject(categoriesArr) {
 export class StyleController {
   static async createStyle(req, res, next) {
     try {
-      const { nickname, title, content, password, categories, tags = [], imageUrls = [] } = req.body;
+      const { nickname, title, content, password, categories, tags = [], imageUrls = [] } = req.validated.body;
 
       let categoriesArr = [];
       if (Array.isArray(categories)) {
@@ -116,7 +116,7 @@ export class StyleController {
   // 스타일 목록 조회
   static async getStyleList(req, res, next) {
     try {
-      const { page = 1, pageSize = 10, sort = 'latest', search } = req.query;
+      const { page = 1, pageSize = 10, sort = 'latest', search } = req.validated.query;
 
       const where = search
         ? {
@@ -183,7 +183,7 @@ export class StyleController {
   // 스타일 상세 조회
   static async getStyleDetail(req, res, next) {
     try {
-      const { styleId } = req.params;
+      const { styleId } = req.validated.params;
 
       await db.style.update({
         where: { styleId: +styleId },
@@ -224,8 +224,8 @@ export class StyleController {
   // 스타일 수정
   static async updateStyle(req, res, next) {
     try {
-      const { styleId } = req.params;
-      const { nickname, password, title, content, categories, tags = [], imageUrls = [] } = req.body;
+      const { styleId } = req.validated.params;
+      const { nickname, password, title, content, categories, tags = [], imageUrls = [] } = req.validated.body;
 
       const style = await db.style.findUnique({ where: { styleId: +styleId } });
       if (!style) {
@@ -309,8 +309,8 @@ export class StyleController {
   // 스타일 삭제
   static async deleteStyle(req, res, next) {
     try {
-      const { styleId } = req.params;
-      const { password } = req.body;
+      const { styleId } = req.validated.params;
+      const { password } = req.validated.body;
 
       const style = await db.style.findUnique({ where: { styleId: +styleId } });
 
@@ -333,12 +333,12 @@ export class StyleController {
       next(err);
     }
   }
-  
+
   // 스타일에 대한 큐레이션 생성 (POST /styles/:styleId/curations)
   static async createCuration(req, res, next) {
     try {
-      const { styleId } = req.validated.params
-      const { nickname, password, trendy, personality, practicality, costEffectiveness, content } = req.validated.body
+      const { styleId } = req.validated.params;
+      const { nickname, password, trendy, personality, practicality, costEffectiveness, content } = req.validated.body;
 
       // 서비스 함수 호출
       const newCuration = await createCurationForStyle({
