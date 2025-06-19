@@ -309,17 +309,173 @@ flowchart TD
 
 ### 김슬비
 
-(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
-
 - [개인 개발 보고서]()
 
-- 기능 1
+**API**
 
-  - 세부설명 1
-  - 세부설명 2
+- curation (/curation)
 
-- 기능 2
-  - 세부설명 1
+  - 스타일에 대한 큐레이팅 생성/조회, 독립적인 큐레이팅 수정/삭제를 위한 API
+  - 큐레이팅 등록 시 비밀번호 해싱(Hashing) 로직 적용 및 안전한 저장 처리
+  - 큐레이팅 수정/삭제 시 입력된 비밀번호와 저장된 해시 비밀번호의 안전한 비교(Compare Password) 로직 적용
+  - 큐레이팅 삭제 시 해당 스타일의 curationCount를 트랜잭션(Transaction)으로 감소 처리
+  - [라우터 코드 (큐레이팅 자체, (PUT, DELETE))](./src/routes/curation-routes.js)
+  - [라우터 코드 (스타일 연관, (POST, GET))](./src/routes/style-route.js#L23-L24)
+  - [컨트롤러 코드 (큐레이팅 자체, (PUT, DELETE)](./src/controllers/curation-controller.js)
+  - [컨트롤러 코드 (스타일 연관, (POST, GET))](./src/controllers/style-controller.js#L337)
+  - [서비스 코드 (큐레이팅 자체, (PUT, DELETE)](./src/services/curation-service.js)
+  - [서비스 코드 (스타일 연관, (POST, GET)](./src/services/style-service.js#L97)
+
+  - API 응답 예시 
+
+* **API명**: 큐레이션 생성
+* **HTTP Method**: `POST`
+* **URL**: `/styles/:styleId/curations`
+* **요청 (Request)**:
+    * **Path Parameters**:
+        * `styleId`: `Number` (필수)
+    * **Body (JSON)**:
+        ```json
+        {
+          "nickname": "String (필수, 1~32자)",
+          "content": "String (필수)",
+          "password": "String (필수, 8~16자, 해싱되어 저장됨)",
+          "trendy": "Number (필수, 1~5점)",
+          "personality": "Number (필수, 1~5점)",
+          "practicality": "Number (필수, 1~5점)",
+          "costEffectiveness": "Number (필수, 1~5점)"
+        }
+        ```
+* **응답 (Response)**:
+    * **성공 (201 Created)**:
+        ```json
+        {
+          "id": 1,
+          "nickname": "큐레이션작성자",
+          "content": "이 스타일은 정말 트렌디해요!",
+          "trendy": 5,
+          "personality": 4,
+          "practicality": 3,
+          "costEffectiveness": 5,
+          "createdAt": "2024-06-19T10:30:00.000Z"
+        }
+        ```
+    * **실패**:
+        * `400 Bad Request`: 필수 필드 누락, 유효하지 않은 데이터 형식/길이 (스키마 유효성 검사 실패)
+        * `404 Not Found`: 해당 `styleId`의 스타일을 찾을 수 없음
+        * `500 Internal Server Error`: 서버 오류
+
+* **API명**: 큐레이션 목록 조회
+* **HTTP Method**: `GET`
+* **URL**: `/styles/:styleId/curations`
+* **요청 (Request)**:
+    * **Path Parameters**:
+        * `styleId`: `Number` (필수)
+    * **Query Parameters**: (모두 선택 사항)
+        * `page`: `Number` (기본값: `1`)
+        * `pageSize`: `Number` (기본값: `10`)
+        * `searchBy`: `String` 
+        * `keyword`: `String` (검색어)
+* **응답 (Response)**:
+    * **성공 (200 OK)**:
+        ```json
+        {
+          "currentPage": 1,
+          "totalPages": 3,
+          "totalItemCount": 25,
+          "data": [
+            {
+              "id": 1,
+              "nickname": "코드잇",
+              "content": "정말 실용적인 스타일입니다.",
+              "trendy": 4,
+              "personality": 3,
+              "practicality": 5,
+              "costEffectiveness": 4,
+              "createdAt": "2024-06-19T11:00:00.000Z",
+              "comment": {
+                "id": 201,
+                "nickname": "스프린터",
+                "content": "동의합니다!",
+                "createdAt": "2024-06-19T11:05:00.000Z"
+              },
+              "style": {
+                "styleId": 123,
+                "name": "미니멀리즘",
+                "imageUrl": "[https://example.com/minimalist.jpg](https://example.com/minimalist.jpg)"
+              }
+            }
+            // ... 다른 큐레이션 객체들
+          ]
+        }
+        ```
+    * **실패**:
+        * `400 Bad Request`: 페이지/페이지 크기 유효하지 않음, 검색 기준 유효하지 않음
+        * `404 Not Found`: 해당 `styleId`의 스타일을 찾을 수 없음
+        * `500 Internal Server Error`: 서버 오류
+
+* **API명**: 큐레이션 수정
+* **HTTP Method**: `PUT`
+* **URL**: `/curations/:curationId`
+* **요청 (Request)**:
+    * **Path Parameters**:
+        * `curationId`: `Number` (필수)
+    * **Body (JSON)**:
+        ```json
+        {
+          "nickname": "String (선택 사항, 1~32자)",          
+          "content": "String (선택 사항)",
+          "password": "String (필수, 8~16자, 등록 시 사용한 비밀번호)",
+          "trendy": "Number (선택 사항, 1~5점)",
+          "personality": "Number (선택 사항, 1~5점)",
+          "practicality": "Number (선택 사항, 1~5점)",
+          "costEffectiveness": "Number (선택 사항, 1~5점)"
+        }
+        ```
+* **응답 (Response)**:
+    * **성공 (200 OK)**:
+        ```json
+        {
+          "id": 1,
+          "nickname": "수정된닉네임",
+          "content": "수정된 큐레이션 내용입니다.",
+          "trendy": 5,
+          "personality": 5,
+          "practicality": 5,
+          "costEffectiveness": 5,
+          "createdAt": "2024-06-19T10:30:00.000Z",
+        }
+        ```
+    * **실패**:
+        * `400 Bad Request`: 필수 필드 누락, 유효하지 않은 데이터 (스키마 유효성 검사 실패)
+        * `403 Forbidden`: 비밀번호 불일치
+        * `404 Not Found`: 해당 `curationId`의 큐레이션을 찾을 수 없음
+        * `500 Internal Server Error`: 서버 오류
+
+* **API명**: 큐레이션 삭제
+* **HTTP Method**: `DELETE`
+* **URL**: `/curations/:curationId`
+* **요청 (Request)**:
+    * **Path Parameters**:
+        * `curationId`: `Number` (필수)
+    * **Body (JSON)**:
+        ```json
+        {
+          "password": "String (필수, 8~16자, 등록 시 사용한 비밀번호)"
+        }
+        ```
+* **응답 (Response)**:
+    * **성공 (200 OK)**:
+        ```json
+        {
+          "message": "큐레이팅 삭제 성공"
+        }
+        ```
+    * **실패**:
+        * `400 Bad Request`: 필수 필드 누락, 유효하지 않은 데이터 (스키마 유효성 검사 실패)
+        * `403 Forbidden`: 비밀번호 불일치
+        * `404 Not Found`: 해당 `curationId`의 큐레이션을 찾을 수 없음
+        * `500 Internal Server Error`: 서버 오류
 
 ### 김진솔
 
