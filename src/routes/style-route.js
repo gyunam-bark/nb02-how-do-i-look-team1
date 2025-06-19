@@ -10,6 +10,7 @@ import {
   createCurationSchema, 
   getCurationListSchema
 } from '../middlewares/dto-middleware.js';
+import { hashPasswordMiddleware } from '../middlewares/bcrypt-middleware.js';
 
 const router = Router();
 
@@ -19,7 +20,7 @@ router.get('/:styleId', validateRequest(getStyleDetailSchema), StyleController.g
 router.put('/:styleId', validateRequest(updateStyleSchema), StyleController.updateStyle);          // 수정
 router.delete('/:styleId', validateRequest(deleteStyleSchema), StyleController.deleteStyle);       // 삭제
 
-router.post('/:styleId/curations', validateRequest(createCurationSchema), StyleController.createCuration);
+router.post('/:styleId/curations', validateRequest(createCurationSchema), hashPasswordMiddleware, StyleController.createCuration);
 router.get('/:styleId/curations', validateRequest(getCurationListSchema), StyleController.getCurationList);
 
 export default router;

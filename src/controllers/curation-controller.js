@@ -1,14 +1,12 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
-
 import { updateCurationService, deleteCurationService } from '../services/curation-service.js';
+
 
 export class CurationController {
   // 큐레이팅 수정 (PUT /curations/:curationId)
   static async updateCuration(req, res, next) {
     try {
-      const { curationId } = req.params;
-      const { password, trendy, personality, practicality, costEffectiveness, content, nickname } = req.body;
+      const { curationId } = req.validated.params;
+      const { password, trendy, personality, practicality, costEffectiveness, content, nickname } = req.validated.body;
 
       const updatedCurationData = await updateCurationService(curationId, {
         password,
@@ -47,8 +45,8 @@ export class CurationController {
   // 큐레이팅 삭제 (DELETE /curations/:curationId)
   static async deleteCuration(req, res, next) {
     try {
-      const { curationId } = req.params;
-      const { password } = req.body;
+      const { curationId } = req.validated.params;
+      const { password } = req.validated.body;
 
       const result = await deleteCurationService(curationId, password);
 
