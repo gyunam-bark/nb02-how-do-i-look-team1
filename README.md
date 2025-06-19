@@ -265,17 +265,75 @@ flowchart TD
 
 ### 김진솔
 
-(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
+- [개인 개발 보고서](https://www.notion.so/jinsoldev/211985c94195804b8b58e0f6b5474342?source=copy_link)
 
-- [개인 개발 보고서]()
+**API**
 
-- 기능 1
+- Ranking (/ranking)
 
-  - 세부설명 1
-  - 세부설명 2
+   - 스타일 랭킹 목록 조회 및 페이지네이션 처리를 위한 API
+   - [라우터 코드](./src/routes/rank-route.js)
+   - [컨트롤러 코드](./src/controllers/rank-controller.js)
+   - [서비스 코드](./src/services/rank-service.js)
+  
+    - 응답 예시
+    ```json
+    {
+      "currentPage": 1,
+      "totalPages": 5,
+      "totalItemCount": 50,
+      "data": [
+        {
+          "id": 1,
+          "thumbnail": "string",
+          "nickname": "string",
+          "title": "string",
+          "tags": ["string", "string"],
+          "categories": {
+            "top": {
+              "name": "string",
+              "brand": "string",
+              "price": 0
+            }
+          },
+          "viewCount": 100,
+          "curationCount": 20,
+          "createdAt": "2024-02-22T07:47:49.803Z",
+          "ranking": 1,
+          "rating": 3.7
+        },
+      ]
+    }
+    ```
 
-- 기능 2
-  - 세부설명 1
+
+- Image Upload (/images)
+
+  - 이미지 업로드를 위한 API
+  - [라우터 코드](./src/routes/image-route.js)
+  - [컨트롤러 코드](./src/controllers/image-controller.js)
+  - [서비스 코드](./src/services/image-service.js)
+
+  - 요청 헤더
+
+    ```json
+    {
+      "content-Type": "multipart/form-data"
+    }
+    ```
+
+  - 요청 예시
+    ```json
+    {
+      "image": "File"
+    }
+    ```
+  - 응답 예시
+    ```json
+    {
+      "imageUrl": "string"
+    }
+    ```
 
 ### 하상준
 
