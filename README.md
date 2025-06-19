@@ -391,13 +391,12 @@ flowchart TD
       "imageUrl": "string"
     }
     ```
-  
+
 **Schema**
 
-  - 데이터베이스 구조 설계
-  - 카테고리 분류를 위한 `CategoryType` enum을 도입하여 데이터 정합성 및 일관성 확보
-  - [스키마 코드](./prisma/schema.prisma)
-  
+- 데이터베이스 구조 설계
+- 카테고리 분류를 위한 `CategoryType` enum을 도입하여 데이터 정합성 및 일관성 확보
+- [스키마 코드](./prisma/schema.prisma)
 
 ### 하상준
 
@@ -435,36 +434,36 @@ flowchart TD
 
 - PASSWORD HASHING (비밀번호 단방향 암호화)
 
-  - 보안을 위해 **답글 등록 시 `password` 필드**를 bcrypt를 사용해 단방향 해싱 처리
+  - 보안을 위해 답글 등록 시 password 필드를 bcrypt를 사용해 단방향 해싱 처리
   - [미들웨어 코드](./src/middlewares/bcrypt-middleware.js)
 
-    - [해싱 유틸 코드](./src/utils/hash-password.js)
+  - [해싱 유틸 코드](./src/utils/hash-password.js)
 
-  - **수정/삭제 시 `password` 검증**을 위해  
+  - 수정/삭제 시 password 검증을 위해  
     요청의 평문 비밀번호와 저장된 해시된 비밀번호를 비교
 
   - [인증 유틸 코드](./src/utils/compare-password.js)
 
-- **POST** 사용 예시
+  - POST 사용 예시
 
-```js
-import { hashPasswordMiddleware } from '../middlewares/bcrypt-middleware.js';
+    ```js
+    import { hashPasswordMiddleware } from '../middlewares/bcrypt-middleware.js';
 
-router.post('/', validateRequest(createStyleSchema), hashPasswordMiddleware, StyleController.createStyle);
-```
+    router.post('/', validateRequest(createStyleSchema), hashPasswordMiddleware, StyleController.createStyle);
+    ```
 
-- **PUT/DELETE** 사용 예시
+  - PUT/DELETE 사용 예시
 
-```js
-import { comparePassword } from '../utils/compare-password.js';
+    ```js
+    import { comparePassword } from '../utils/compare-password.js';
 
-const isMatch = await comparePassword(plainPassword, hashedPassword);
-if (!isMatch) {
-  const error = new Error();
-  error.statusCode = 403;
-  throw error;
-}
-```
+    const isMatch = await comparePassword(plainPassword, hashedPassword);
+    if (!isMatch) {
+      const error = new Error();
+      error.statusCode = 403;
+      throw error;
+    }
+    ```
 
 ---
 
