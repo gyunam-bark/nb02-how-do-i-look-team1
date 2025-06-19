@@ -1,6 +1,8 @@
 import db from '../config/db.js';
 import { createCurationForStyle } from '../services/style-service.js';
 import { getCurationList } from '../services/style-service.js';
+import { comparePassword } from '../utils/compare-password.js';
+
 // 유틸 함수
 async function getOrCreateTagIds(tagNames = []) {
   const tagObjs = [];
@@ -231,8 +233,13 @@ export class StyleController {
       if (!style) {
         return res.status(404).json({ message: '스타일을 찾을 수 없습니다.' });
       }
-      if (style.password !== password) {
-        return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
+
+      const isMatch = await comparePassword(password, style.password);
+
+      if (!isMatch) {
+        const error = new Error('비밀번호가 일치하지 않습니다.');
+        error.statusCode = 403;
+        throw error;
       }
 
       // categories 변환
@@ -318,9 +325,14 @@ export class StyleController {
         return res.status(404).json({ message: '스타일을 찾을 수 없습니다.' });
       }
 
-      if (style.password !== password) {
-        return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
+      const isMatch = await comparePassword(password, style.password);
+
+      if (!isMatch) {
+        const error = new Error('비밀번호가 일치하지 않습니다.');
+        error.statusCode = 403;
+        throw error;
       }
+
       // 관련된 카테고리, 태그, 이미지 삭제
       await db.category.deleteMany({ where: { styleId: +styleId } });
       await db.styleTag.deleteMany({ where: { styleId: +styleId } });
