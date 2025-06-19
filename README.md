@@ -391,6 +391,13 @@ flowchart TD
       "imageUrl": "string"
     }
     ```
+  
+**Schema**
+
+  - 데이터베이스 구조 설계
+  - 카테고리 분류를 위한 `CategoryType` enum을 도입하여 데이터 정합성 및 일관성 확보
+  - [스키마 코드](./prisma/schema.prisma)
+  
 
 ### 하상준
 
