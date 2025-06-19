@@ -309,7 +309,7 @@ flowchart TD
 
 ### 김슬비
 
-- [개인 개발 보고서]()
+- [개인 개발 보고서](https://github.com/stella62420/nb02-how-do-i-look-report)
 
 **API**
 
