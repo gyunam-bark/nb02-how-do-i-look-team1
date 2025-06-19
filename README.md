@@ -239,15 +239,73 @@ flowchart TD
 
 (자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
 
-- [개인 개발 보고서]()
+- [개인 개발 보고서](https://github.com/kwonnahyun0125/How-Do-I-Look-Report/blob/main/README.md)
 
-- 기능 1
+**API**
 
-  - 세부설명 1
-  - 세부설명 2
+- Style (/styles)
 
-- 기능 2
-  - 세부설명 1
+  - 스타일 등록/조회/상세조회/수정/삭제를 하기 위한 API
+  - Style 등록/수정 시 태그(name→findOrCreate→연결), 카테고리(객체→배열 변환), 이미지(업로드/연결) 등
+    다대다/1:N 구조 처리
+  - Prisma 관계설정 기반으로 중간 테이블 자동 연결/갱신
+  - FE 요구사항 반영해 style, tags, categories, imageUrls 모두 명세대로 직렬화/포맷 맞춤 응답
+  - Style 삭제 시 외래키 제약(PK-FK) 오류 발생 문제 해결 (cascade delete 등 적용)
+  - [라우터 코드](./src/routes/style-route.js)
+  - [컨트롤러 코드](./src/controllers/style-controller.js)
+  - [서비스 코드](./src/services/style-service.js)
+
+  - API 요청/응답 예시 (201 Created)
+
+  ```json
+  {
+    "id": 1,
+    "nickname": "나현",
+    "title": "여름 데일리룩",
+    "content": "시원하게 입는게 최고!",
+    "viewCount": 0,
+    "curationCount": 0,
+    "createdAt": "2025-06-18T09:12:37.365Z",
+    "categories": {
+      "top": {
+        "name": "반팔티",
+        "brand": "유니클로",
+        "price": 19900
+      },
+      "bottom": {
+        "name": "숏팬츠",
+        "brand": "지오다노",
+        "price": 15900
+      }
+    },
+    "tags": ["캐주얼", "미니멀", "여름"],
+    "imageUrls": ["https://img.example.com/style1.jpg", "https://img.example.com/style2.jpg"]
+  }
+  ```
+
+**Prisma**
+
+- Schema
+
+  - 데이터베이스 구조 설계
+  - [스키마 코드](./prisma/schema.prisma)
+
+- Seed 데이터 설계
+  - `seed.js`에서 대량의 style/curation/comment 샘플 자동 생성, 실이미지 URL 적용, password 정책 일치화
+  - 실사용 테스트를 위한 실시간 데이터(프론트/백 모두) 공유 가능하게 구조화
+  - [시드 코드](./prisma/seed.js)
+  - `seed.js` 주요 코드\*\*
+  ```json
+  for (const [i, styleData] of styleDatas.entries()) {
+    // ... style 생성 ...
+  }
+  for (const curation of curationSeeds) {
+    // ... curation 생성 ...
+  }
+  for (const [i, comment] of commentSeeds.entries()) {
+    // ... comment 생성 ...
+  }
+  ```
 
 ### 김슬비
 
@@ -271,41 +329,40 @@ flowchart TD
 
 - Ranking (/ranking)
 
-   - 스타일 랭킹 목록 조회 및 페이지네이션 처리를 위한 API
-   - [라우터 코드](./src/routes/rank-route.js)
-   - [컨트롤러 코드](./src/controllers/rank-controller.js)
-   - [서비스 코드](./src/services/rank-service.js)
-  
-    - 응답 예시
-    ```json
-    {
-      "currentPage": 1,
-      "totalPages": 5,
-      "totalItemCount": 50,
-      "data": [
-        {
-          "id": 1,
-          "thumbnail": "string",
-          "nickname": "string",
-          "title": "string",
-          "tags": ["string", "string"],
-          "categories": {
-            "top": {
-              "name": "string",
-              "brand": "string",
-              "price": 0
-            }
-          },
-          "viewCount": 100,
-          "curationCount": 20,
-          "createdAt": "2024-02-22T07:47:49.803Z",
-          "ranking": 1,
-          "rating": 3.7
-        },
-      ]
-    }
-    ```
+  - 스타일 랭킹 목록 조회 및 페이지네이션 처리를 위한 API
+  - [라우터 코드](./src/routes/rank-route.js)
+  - [컨트롤러 코드](./src/controllers/rank-controller.js)
+  - [서비스 코드](./src/services/rank-service.js)
+  - 응답 예시
 
+  ```json
+  {
+    "currentPage": 1,
+    "totalPages": 5,
+    "totalItemCount": 50,
+    "data": [
+      {
+        "id": 1,
+        "thumbnail": "string",
+        "nickname": "string",
+        "title": "string",
+        "tags": ["string", "string"],
+        "categories": {
+          "top": {
+            "name": "string",
+            "brand": "string",
+            "price": 0
+          }
+        },
+        "viewCount": 100,
+        "curationCount": 20,
+        "createdAt": "2024-02-22T07:47:49.803Z",
+        "ranking": 1,
+        "rating": 3.7
+      }
+    ]
+  }
+  ```
 
 - Image Upload (/images)
 
@@ -334,6 +391,13 @@ flowchart TD
       "imageUrl": "string"
     }
     ```
+  
+**Schema**
+
+  - 데이터베이스 구조 설계
+  - 카테고리 분류를 위한 `CategoryType` enum을 도입하여 데이터 정합성 및 일관성 확보
+  - [스키마 코드](./prisma/schema.prisma)
+  
 
 ### 하상준
 
